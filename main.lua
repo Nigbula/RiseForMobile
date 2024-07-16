@@ -1,6 +1,6 @@
 local riseoptions = {
 	CustomText = "",
-	Theme = "Rise Blend",
+	Theme = "Rise Christmas",
 	RenderToggle = true,
 	ShowRenderModules = true,
 	NameTags = false,
