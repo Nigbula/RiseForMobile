@@ -1,52 +1,5 @@
-local riseoptions = {
-	CustomText = "",
-	Theme = "Rise Blend",
-	RenderToggle = true,
-	ShowRenderModules = true,
-	NameTags = false,
-	R = 1,
-	G = 1,
-	B = 1
-}
-
-local risethemes = {
-	["Rise Blend"] = {
-		TextGUIColor1 = Color3.fromRGB(71, 233, 160),
-		TextGUIColor2 = Color3.fromRGB(71, 148, 253),
-	},
-	["Rise"] = {
-		TextGUIColor1 = Color3.fromRGB(255, 255, 255),
-		TextGUIColor2 = Color3.fromRGB(255, 255, 255),
-	},
-	["Rise Christmas"] = {
-		TextGUIColor1 = Color3.fromRGB(255, 12, 12),
-		TextGUIColor2 = Color3.fromRGB(255, 255, 255),
-	},
-	["Rise Cotton Candy"] = {
-		TextGUIColor1 = Color3.fromRGB(241, 111, 204),
-		TextGUIColor2 = Color3.fromRGB(101, 246, 254),
-	},
-	["Rice"] = {
-		TextGUIColor1 = Color3.fromRGB(190, 0, 255),
-		TextGUIColor2 = Color3.fromRGB(0, 190, 255),
-	},
-}
-
-if isfolder("rise") == false then
-	makefolder("rise")
-end
-if isfolder("rise/assets") == false then
-	makefolder("rise/assets")
-end
-
-local function SaveSettings()
-	writefile("rise/settings.json", game:GetService("HttpService"):JSONEncode(riseoptions))
-end
-
-local players = game:GetService("Players")
-local lplr = players.LocalPlayer
+local uilib = {}
 local getasset = getsynasset or getcustomasset or function(location) return "rbxasset://"..location end
-local queueteleport = syn and syn.queue_on_teleport or queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
 local requestfunc = syn and syn.request or http and http.request or http_request or fluxus and fluxus.request or request or function(tab)
 	if tab.Method == "GET" then
 		return {
@@ -66,170 +19,18 @@ local betterisfile = function(file)
 	local suc, res = pcall(function() return readfile(file) end)
 	return suc and res ~= nil
 end
-local setthreadidentityfunc = syn and syn.set_thread_identity or set_thread_identity or setidentity or setthreadidentity
-local getthreadidentityfunc = syn and syn.get_thread_identity or get_thread_identity or getidentity or getthreadidentity
-local function GetURL(scripturl, rise)
-	if shared.VapeDeveloper then
-		if not betterisfile((rise and "rise/" or "vape/")..scripturl) then
-			error("File not found : "..(rise and "rise/" or "vape/")..scripturl)
-		end
-		return readfile((rise and "rise/" or "vape/")..scripturl)
-	else
-		local res = game:HttpGet("https://raw.githubusercontent.com/Nigbula/"..(rise and "RiseForRoblox" or "vapevoidware").."/main/"..scripturl, true)
-		assert(res ~= "404: Not Found", "File not found")
-		return res
+
+local function randomString()
+	local randomlength = math.random(10,100)
+	local array = {}
+
+	for i = 1, randomlength do
+		array[i] = string.char(math.random(32, 126))
 	end
+
+	return table.concat(array)
 end
-local VapeGui
-local universalcolor = Color3.new(1, 1, 1)
-local targetinfohealthbar
-local guilib = loadstring(GetURL("guilib.lua", true))()
-guilib.ScreenGui.MainFrame.Visible = false
-spawn(function()
-	repeat task.wait() until shared.GuiLibrary
-	VapeGui = shared.GuiLibrary
-	local notificationwindow = Instance.new("Frame")
-	notificationwindow.Size = UDim2.new(1, 0, 1, 0)
-	notificationwindow.BackgroundTransparency = 1
-	notificationwindow.Parent = guilib.ScreenGui
-	spawn(function()
-		local num = 0
-		repeat
-			task.wait(0.01)
-			local colornew = risethemes[riseoptions.Theme].TextGUIColor1
-			if num < 1 then
-				colornew = risethemes[riseoptions.Theme].TextGUIColor1:lerp(risethemes[riseoptions.Theme].TextGUIColor2, num)
-			elseif num < 2 then 
-				colornew = risethemes[riseoptions.Theme].TextGUIColor2:lerp(risethemes[riseoptions.Theme].TextGUIColor1, num - 1)
-			else
-				num = 0
-			end
-			if targetinfohealthbar then
-				targetinfohealthbar.BackgroundColor3 = colornew
-			end
-			universalcolor = colornew
-			for i,v in pairs(notificationwindow:GetChildren()) do 
-				if v:IsA("Frame") then 
-					pcall(function()
-						v.Frame.BackgroundColor3 = colornew
-						v.TextLabel.TextColor3 = colornew
-						v.TextLabel2.TextColor3 = colornew
-					end)
-				end
-			end
-			num = num + 0.03
-		until guilib.ScreenGui == nil or guilib.ScreenGui.Parent == nil
-	end)
 
-	local function bettertween(obj, newpos, dir, style, tim, override)
-		spawn(function()
-			local frame = Instance.new("Frame")
-			frame.Visible = false
-			frame.Position = obj.Position
-			frame.Parent = guilib.ScreenGui
-			frame:GetPropertyChangedSignal("Position"):connect(function()
-				obj.Position = UDim2.new(obj.Position.X.Scale, obj.Position.X.Offset, frame.Position.Y.Scale, frame.Position.Y.Offset)
-			end)
-			frame:TweenPosition(newpos, dir, style, tim, override)
-			frame.Parent = nil
-			task.wait(tim)
-			frame:Remove()
-		end)
-	end
-
-	local function bettertween2(obj, newpos, dir, style, tim, override)
-		spawn(function()
-			local frame = Instance.new("Frame")
-			frame.Visible = false
-			frame.Position = obj.Position
-			frame.Parent = guilib.ScreenGui
-			frame:GetPropertyChangedSignal("Position"):connect(function()
-				obj.Position = UDim2.new(frame.Position.X.Scale, frame.Position.X.Offset, obj.Position.Y.Scale, obj.Position.Y.Offset)
-			end)
-			pcall(function()
-				frame:TweenPosition(newpos, dir, style, tim, override)
-			end)
-			frame.Parent = nil
-			task.wait(tim)
-			frame:Remove()
-		end)
-	end
-
-	notificationwindow.ChildRemoved:connect(function()
-		for i,v in pairs(notificationwindow:GetChildren()) do
-			bettertween(v, UDim2.new(1, v.Position.X.Offset, 1, -(150 + 80 * (i - 1))), Enum.EasingDirection.In, Enum.EasingStyle.Sine, 0.15, true)
-		end
-	end)
-
-	local function removeTags(str)
-		str = str:gsub("<br%s*/>", "\n")
-		return (str:gsub("<[^<>]->", ""))
-	end
-
-	VapeGui.CreateNotification = function(top, bottom, duration, customicon)
-		local offset = #notificationwindow:GetChildren()
-		local togglecheck = (bottom:find("Enabled") or bottom:find("Disabled"))
-		if (togglecheck and (not riseoptions.RenderToggle)) then return end
-		local togglecheck2 = bottom:find("Enabled") and true or false
-		local newtext = removeTags(togglecheck and (togglecheck2 and "Enabled " or "Disabled ")..bottom:split(" ")[1] or bottom)
-		local calculatedsize = game:GetService("TextService"):GetTextSize(newtext, 13, Enum.Font.Gotham, Vector2.new(100000, 13))
-		local frame = Instance.new("Frame")
-		frame.Size = UDim2.new(0, calculatedsize.X + 20, 0, 60)
-		frame.Position = UDim2.new(1, 0, 1, -(150 + 80 * offset))
-		frame.BackgroundTransparency = 0.5
-		frame.BackgroundColor3 = Color3.new(0, 0,0)
-		frame.BorderSizePixel = 0
-		frame.Parent = notificationwindow
-		frame.Visible = true
-		frame.ClipsDescendants = false
-		local uicorner = Instance.new("UICorner")
-		uicorner.CornerRadius = UDim.new(0, 4)
-		uicorner.Parent = frame
-		local textlabel1 = Instance.new("TextLabel")
-		textlabel1.Font = Enum.Font.Gotham
-		textlabel1.TextSize = 13
-		textlabel1.RichText = true
-		textlabel1.TextTransparency = 0.1
-		textlabel1.TextColor3 = risethemes[riseoptions.Theme].TextGUIColor1
-		textlabel1.BackgroundTransparency = 1
-		textlabel1.Position = UDim2.new(0, 10, 0, 10)
-		textlabel1.TextXAlignment = Enum.TextXAlignment.Left
-		textlabel1.TextYAlignment = Enum.TextYAlignment.Top
-		textlabel1.Text = "Notification"
-		textlabel1.Parent = frame
-		local textlabel2 = textlabel1:Clone()
-		textlabel2.Position = UDim2.new(0, 10, 0, 30)
-		textlabel2.Font = Enum.Font.Gotham
-		textlabel2.Name = "TextLabel2"
-		textlabel2.TextTransparency = 0
-		textlabel2.RichText = true
-		local frame2 = Instance.new("Frame")
-		frame2.AnchorPoint = Vector2.new(1, 0)
-		frame2.Size = UDim2.new(1, 0, 0, 4)
-		frame2.Position = UDim2.new(1, 0, 1, -4)
-		frame2.BackgroundColor3 = Color3.fromRGB(71, 233, 175)
-		frame2.BorderSizePixel = 0
-		frame2.Parent = frame
-		textlabel2.Text = newtext
-		textlabel2.Parent = frame
-		spawn(function()
-			pcall(function()
-				bettertween2(frame, UDim2.new(1, -(calculatedsize.X + 20), 1, -(120 + 80 * offset)), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.2, true)
-				wait(0.2)
-				frame2:TweenSize(UDim2.new(0, 0, 0, 4), Enum.EasingDirection.In, Enum.EasingStyle.Linear, duration, true)
-				wait(duration)
-				bettertween2(frame, UDim2.new(1, 0, 1, frame.Position.Y.Offset), Enum.EasingDirection.In, Enum.EasingStyle.Quad, 0.2, true)
-				wait(0.2)
-				frame:Remove()
-			end)
-		end)
-		return frame
-	end
-	VapeGui["MainGui"].ScaledGui.Visible = false
-end)
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Nigbula/vapevoidware/main/NewMainScript.lua", true))()
-shared.VapeIndependent = true
-if not VapeGui then VapeGui = shared.GuiLibrary end
 local cachedassets = {}
 local function getcustomassetfunc(path)
 	if not betterisfile(path) then
@@ -243,12 +44,12 @@ local function getcustomassetfunc(path)
 			textlabel.Font = Enum.Font.SourceSans
 			textlabel.TextColor3 = Color3.new(1, 1, 1)
 			textlabel.Position = UDim2.new(0, 0, 0, -36)
-			textlabel.Parent = VapeGui["MainGui"]
+			textlabel.Parent = api["MainGui"]
 			repeat wait() until betterisfile(path)
 			textlabel:Remove()
 		end)
 		local req = requestfunc({
-			Url = "https://raw.githubusercontent.com/Nigbula/RiseForRoblox/main/"..path:gsub("rise/assets", "assets"),
+			Url = "https://raw.githubusercontent.com/VapeVoidware/RiseForRoblox/main/"..path:gsub("rise/assets", "assets"),
 			Method = "GET"
 		})
 		writefile(path, req.Body)
@@ -259,1001 +60,617 @@ local function getcustomassetfunc(path)
 	return cachedassets[path]
 end
 
-local teleportfunc = game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
-	if State == Enum.TeleportState.Started then
-		local teleportstr = 'shared.VapeSwitchServers = true if shared.VapeDeveloper then loadstring(readfile("rise/main.lua"))() else loadstring(game:HttpGet("https://raw.githubusercontent.com/Nigbula/RiseForRoblox/main/main.lua", true))() end'
-		if shared.VapeDeveloper then
-			teleportstr = 'shared.VapeDeveloper = true '..teleportstr
-		end
-		if shared.VapePrivate then
-			teleportstr = 'shared.VapePrivate = true '..teleportstr
-		end
-		VapeGui["SaveSettings"]()
-		queueteleport(teleportstr)
-	end
-end)
+local function RelativeXY(GuiObject, location)
+	local x, y = location.X - GuiObject.AbsolutePosition.X, location.Y - GuiObject.AbsolutePosition.Y
+	local x2 = 0
+	local xm, ym = GuiObject.AbsoluteSize.X, GuiObject.AbsoluteSize.Y
+	x2 = math.clamp(x, 4, xm - 6)
+	x = math.clamp(x, 0, xm)
+	y = math.clamp(y, 0, ym)
+	return x, y, x/xm, y/ym, x2/xm
+end
 
-local RenderStepTable = {}
-local function BindToRenderStep(name, num, func)
-	if RenderStepTable[name] == nil then
-		RenderStepTable[name] = game:GetService("RunService").RenderStepped:connect(func)
+local function dragGUI(gui)
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 	end
-end
-local function UnbindFromRenderStep(name)
-	if RenderStepTable[name] then
-		RenderStepTable[name]:Disconnect()
-		RenderStepTable[name] = nil
-	end
-end
-VapeGui["MainGui"].ScaledGui.Visible = false
-guilib.ScreenGui.MainFrame.Visible = VapeGui["MainGui"].ScaledGui.ClickGui.Visible
-VapeGui["MainGui"].ScaledGui.ClickGui:GetPropertyChangedSignal("Visible"):connect(function()
-	guilib.ScreenGui.MainFrame.Visible = VapeGui["MainGui"].ScaledGui.ClickGui.Visible
-	task.delay(0.001, function()
-		game:GetService("RunService"):SetRobloxGuiFocused(false)	
+
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
 	end)
-	if VapeGui["MainGui"].ScaledGui.ClickGui.Visible then
-		guilib.ScreenGui.MainFrame.Size = UDim2.new(0, 548, 0, 300)
-		guilib.ScreenGui.MainFrame.Position = UDim2.new(0.5, -264, 0.5, -294)
-		guilib.ScreenGui.MainFrame:TweenSize(UDim2.new(0, 548, 0, 300), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true)
-		guilib.ScreenGui.MainFrame:TweenPosition(UDim2.new(0.5, -330, 0.5, -368), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true)
-	end
-end)
-local windowtabs = {
-	Combat = guilib:CreateCategory({
-		Name = "Combat",
-		Icon = "⚔️"
-	}),
-	Blatant = guilib:CreateCategory({
-		Name = "Blatant",
-		Icon = "⚠️"
-	}),
-	Render = guilib:CreateCategory({
-		Name = "Render",
-		Icon = "👁️"
-	}),
-	Utility = guilib:CreateCategory({
-		Name = "Utility",
-		Icon = "🛠️"
-	}),
-	World = guilib:CreateCategory({
-		Name = "World",
-		Icon = "🌎"
-	}),
-	Info = guilib:CreateCategory({
-		Name = "Info",
-		Icon = "ℹ️"
-	}),
-	Voidware = guilib:CreateCategory({
-		Name = "Voidware",
-		Icon = "🛠️"
-	})
-}
 
-local infolab1 = windowtabs.Info:CreateLabel()
-infolab1.Size = UDim2.new(0, 200, 0, 70)
-infolab1.Position = UDim2.new(0, 124, 0, 155)
-infolab1.TextColor3 = Color3.fromRGB(180, 180, 180)
-infolab1.TextSize = 90
-infolab1.Font = Enum.Font.SourceSans
-infolab1.Text = "Rise x Voidware"
-infolab1.TextXAlignment = Enum.TextXAlignment.Left
-infolab1.TextYAlignment = Enum.TextYAlignment.Bottom
-infolab1.BackgroundTransparency = 1
-local infolab2 = windowtabs.Info:CreateLabel()
-infolab2.Size = UDim2.new(0, 200, 0, 70)
-infolab2.Position = UDim2.new(0, 250, 0, 136)
-infolab2.TextColor3 = Color3.fromRGB(130, 130, 130)
-infolab2.TextSize = 40
-infolab2.Font = Enum.Font.SourceSans
-infolab2.Text = "roblox"
-infolab2.TextXAlignment = Enum.TextXAlignment.Left
-infolab2.TextYAlignment = Enum.TextYAlignment.Top
-infolab2.BackgroundTransparency = 1
-local infolab3 = windowtabs.Info:CreateLabel()
-infolab3.Size = UDim2.new(0, 200, 0, 70)
-infolab3.Position = UDim2.new(0, 124, 0, 263)
-infolab3.TextColor3 = Color3.fromRGB(180, 180, 180)
-infolab3.TextSize = 30
-infolab3.Font = Enum.Font.SourceSansLight
-infolab3.Text = "Registered to Voidware"
-infolab3.TextXAlignment = Enum.TextXAlignment.Left
-infolab3.TextYAlignment = Enum.TextYAlignment.Top
-infolab3.BackgroundTransparency = 1
-local infolab4 = windowtabs.Info:CreateLabel()
-infolab4.Size = UDim2.new(0, 200, 0, 70)
-infolab4.Position = UDim2.new(0, 124, 0, 320)
-infolab4.TextColor3 = Color3.fromRGB(130, 130, 130)
-infolab4.TextSize = 30
-infolab4.Font = Enum.Font.SourceSansLight
-infolab4.Text = [[
-Roblox Vape conversion - Xylex
-Modules - Vape and Voidware
-Orignal Client by Alan32, Technio
-Strikeless, Nicklas, Auth,
-Hazsi, Solastis
-and Billionare
-intent.store
-riseclient.com
-    
-Roblox Port by 7GrandDad
-All rights goto the Rise Team
-]]
-infolab4.TextXAlignment = Enum.TextXAlignment.Left
-infolab4.TextYAlignment = Enum.TextYAlignment.Top
-infolab4.BackgroundTransparency = 1
-
-local windowbuttons = {}
-local tab = {}
-local tab2 = {}
-for i,v in pairs(VapeGui["ObjectsThatCanBeSaved"]) do 
-	if v.Type == "OptionsButton" then
-		table.insert(tab, v)
-	end
-	if v.Type == "Toggle" then
-		table.insert(tab2, v)
-	end
-	if v.Type == "Slider" then
-		table.insert(tab2, v)
-	end
-	if v.Type == "Dropdown" then
-		table.insert(tab2, v)
-	end
-	if v.Type == "TextBox" then
-		table.insert(tab2, v)
-	end
-	if v.Type == "ColorSlider" then
-		table.insert(tab2, v)
-	end
-end
-table.sort(tab, function(a, b) 
-	if a.Type ~= "OptionsButton" then
-		a = {Object = {Name = tostring(a["Object"].Parent):gsub("Children", "")..a["Object"].Name}}
-	else
-		a = {Object = {Name = a["Object"].Name}}
-	end
-	if b.Type ~= "OptionsButton" then
-		b = {Object = {Name = tostring(b["Object"].Parent):gsub("Children", "")..b["Object"].Name}}
-	else
-		b = {Object = {Name = b["Object"].Name}}
-	end
-	return a["Object"].Name:lower() < b["Object"].Name:lower() 
-end)
---[[table.sort(tab2, function(a, b) 
-    a = {Object = {Name = tostring(a["Object"].Parent):gsub("Children", "")..a["Object"].Name}}
-    b = {Object = {Name = tostring(b["Object"].Parent):gsub("Children", "")..b["Object"].Name}}
-    return a["Object"].Name:lower() < b["Object"].Name:lower() 
-end)]]
-for i,v in pairs(tab) do 
-	if v.Type == "OptionsButton" then 
-		local old = v["Api"]["ToggleButton"]
-		local newstr = tostring(v["Object"]):gsub("Button", "")
-		windowbuttons[newstr] = windowtabs[tostring(v["Object"].Parent.Parent)]:CreateButton({
-			Name = newstr,
-			Function = function(callback)
-				if callback ~= v["Api"]["Enabled"] then
-					old(true)
-				end
-			end,
-			HoverText = v["Api"]["HoverText"] or ""
-		})
-		v["Api"]["ToggleButton"] = function(clicked, toggle)
-			local res = old(clicked, toggle)
-			windowbuttons[newstr]:ToggleButton(false, v["Api"]["Enabled"])
-			return res
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
 		end
-		windowbuttons[newstr]:ToggleButton(false, v["Api"]["Enabled"])
-	end
-end
-for i,v in pairs(tab2) do 
-	if v.Type == "Toggle" and tostring(v["Object"].Parent.Parent.Parent) ~= "ClickGui" and VapeGui["ObjectsThatCanBeSaved"][tostring(v["Object"].Parent):gsub("Children", "OptionsButton")] and VapeGui["ObjectsThatCanBeSaved"][tostring(v["Object"].Parent):gsub("Children", "OptionsButton")]["ChildrenObject"] == v["Object"].Parent then
-		local newstr = tostring(v["Object"].Parent):gsub("Children", "")
-		local old = v["Api"]["ToggleButton"]
-		local tog = windowbuttons[newstr]:CreateToggle({
-			Name = tostring(v["Object"]):gsub("Button", ""),
-			Function = function(callback)
-				if callback ~= v["Api"]["Enabled"] then
-					old(not v["Api"]["Enabled"])
-				end
-			end
-		})
-		v["Api"]["ToggleButton"] = function(clicked, toggle)
-			local res = old(clicked, toggle)
-			tog:ToggleButton(false, v["Api"]["Enabled"])
-			return res
+	end)
+
+	game:GetService("UserInputService").InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
 		end
-		tog:SetLayoutOrder(v["Object"].LayoutOrder)
-		tog:ToggleButton(false, v["Api"]["Enabled"])
-		tog.Object.Visible = v["Object"].Visible
-		v["Object"]:GetPropertyChangedSignal("Visible"):connect(function()
-			tog.Object.Visible = v["Object"].Visible
-		end)
-	end
-	if v.Type == "Slider" and VapeGui["ObjectsThatCanBeSaved"][tostring(v["Object"].Parent):gsub("Children", "OptionsButton")] and VapeGui["ObjectsThatCanBeSaved"][tostring(v["Object"].Parent):gsub("Children", "OptionsButton")]["ChildrenObject"] == v["Object"].Parent then
-		local newstr = tostring(v["Object"].Parent):gsub("Children", "")
-		local old = v["Api"]["SetValue"]
-		local slider = windowbuttons[newstr]:CreateSlider({
-			Name = v["Object"].Name,
-			Min = v["Api"]["Min"],
-			Max = v["Api"]["Max"],
-			Function = function(s) -- 500 (MaxValue) | 0 (MinValue)
-				if s ~= v["Api"]["Value"] then
-					old(s)
-				end
-			end
-		})
-		slider:SetLayoutOrder(v["Object"].LayoutOrder)
-		v["Api"]["SetValue"] = function(value, ...)
-			local res = old(value, ...)
-			slider:SetValue(value)
-			return res
-		end
-		v["Api"]["SetValue"](tonumber(v["Api"]["Value"]))
-		slider.Object.Visible = v["Object"].Visible
-		v["Object"]:GetPropertyChangedSignal("Visible"):connect(function()
-			slider.Object.Visible = v["Object"].Visible
-		end)
-	end
-	if v.Type == "Dropdown" and VapeGui["ObjectsThatCanBeSaved"][tostring(v["Object"].Parent):gsub("Children", "OptionsButton")] and VapeGui["ObjectsThatCanBeSaved"][tostring(v["Object"].Parent):gsub("Children", "OptionsButton")]["ChildrenObject"] == v["Object"].Parent then
-		local newstr = tostring(v["Object"].Parent):gsub("Children", "")
-		local old = v["Api"]["SetValue"]
-		local drop = windowbuttons[newstr]:CreateDropdown({
-			Name = v["Object"].Name,
-			List = v["Api"]["List"],
-			Function = function(s)
-				if s ~= v["Api"]["Value"] then
-					old(s)
-				end
-			end
-		})
-		drop:SetValue(v["Api"]["Value"])
-		drop:SetLayoutOrder(v["Object"].LayoutOrder)
-		drop.Object.Visible = v["Object"].Visible
-		v["Object"]:GetPropertyChangedSignal("Visible"):connect(function()
-			drop.Object.Visible = v["Object"].Visible
-		end)
-	end
-	if v.Type == "TextBox" and VapeGui["ObjectsThatCanBeSaved"][tostring(v["Object"].Parent):gsub("Children", "OptionsButton")] and VapeGui["ObjectsThatCanBeSaved"][tostring(v["Object"].Parent):gsub("Children", "OptionsButton")]["ChildrenObject"] == v["Object"].Parent then
-		local newstr = tostring(v["Object"].Parent):gsub("Children", "")
-		local old = v["Api"]["SetValue"]
-		local drop = {["Value"] = ""}
-		drop = windowbuttons[newstr]:CreateTextBox({
-			Name = v["Object"].Name,
-			TempText = v["Object"].AddBoxBKG.AddBox.PlaceholderText,
-			Function = function(val)
-				if val ~= v["Api"]["Value"] then
-					old(drop["Value"], false)
-				end
-			end
-		})
-		drop:SetValue(v["Api"]["Value"])
-		drop:SetLayoutOrder(v["Object"].LayoutOrder)
-		drop.Object.Visible = v["Object"].Visible
-		v["Object"]:GetPropertyChangedSignal("Visible"):connect(function()
-			drop.Object.Visible = v["Object"].Visible
-		end)
-	end
+	end)
 end
 
-local oldtab
-local oldfunc
-local olduninject = VapeGui.SelfDestruct
-local nametagconnection
-VapeGui.SelfDestruct = function(...)
-	guilib.ScreenGui:Remove()
-	if oldtab and oldfunc then 
-		oldtab.ProcessCompletedChatMessage = oldfunc
-	end
-	if nametagconnection then 
-		nametagconnection:Disconnect()
-	end
-	if teleportfunc then 
-		teleportfunc:Disconnect()
-	end
-	return olduninject(...)
+if not is_sirhurt_closure and syn and syn.protect_gui then
+	local gui = Instance.new("ScreenGui")
+	gui.Name = randomString()
+	gui.DisplayOrder = 999
+	syn.protect_gui(gui)
+	gui.Parent = game:GetService("CoreGui")
+	uilib.ScreenGui = gui
+elseif gethui then
+	local gui = Instance.new("ScreenGui")
+	gui.Name = randomString()
+	gui.DisplayOrder = 999
+	gui.Parent = gethui()
+	uilib.ScreenGui = gui
+elseif game:GetService("CoreGui"):FindFirstChild('RobloxGui') then
+	uilib.ScreenGui = game:GetService("CoreGui").RobloxGui
 end
-windowtabs.World:CreateButton({
-	Name = "UnInject",
-	Function = function(callback)
-		VapeGui.SelfDestruct()
-	end
-})
 
-local modal = Instance.new("TextButton")
-modal.Size = UDim2.new(0, 0, 0, 0)
-modal.BorderSizePixel = 0
-modal.Text = ""
-modal.Modal = true
-modal.Parent = guilib.ScreenGui.MainFrame
-local targetinfo = Instance.new("Frame")
-targetinfo.Size = UDim2.new(0, 258, 0, 80)
-targetinfo.Visible = false
-targetinfo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-targetinfo.BackgroundTransparency = 0.5
-targetinfo.Position = UDim2.new(0.5, 72, 0.5, 54)
-targetinfo.ClipsDescendants = true
-targetinfo.Parent = guilib.ScreenGui
-local targetinfoscale = Instance.new("UIScale")
-targetinfoscale.Parent = targetinfo
-targetinfo:GetPropertyChangedSignal("Size"):connect(function()
-	targetinfoscale.Scale = targetinfo.Size.X.Offset / 258
-end)
-local targetinfocorner = Instance.new("UICorner")
-targetinfocorner.CornerRadius = UDim.new(0, 8)
-targetinfocorner.Parent = targetinfo
-local targetinfopictureframe = Instance.new("Frame")
-targetinfopictureframe.Size = UDim2.new(0, 64, 0, 63)
-targetinfopictureframe.AnchorPoint = Vector2.new(0.5, 0.5)
-targetinfopictureframe.Position = UDim2.new(0, 38, 0, 39)
-targetinfopictureframe.BackgroundTransparency = 0.8
-targetinfopictureframe.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-targetinfopictureframe.Parent = targetinfo
-local targetinfopictureframecorner = Instance.new("UICorner")
-targetinfopictureframecorner.CornerRadius = UDim.new(0, 128)
-targetinfopictureframecorner.Parent = targetinfopictureframe
-local targetinfopicture = Instance.new("ImageLabel")
-targetinfopicture.Size = UDim2.new(1, -4, 1, -4)
-targetinfopicture.Position = UDim2.new(0, 2, 0, 2)
-targetinfopicture.BackgroundTransparency = 1
-targetinfopicture.ScaleType = Enum.ScaleType.Fit
-targetinfopicture.Image = 'rbxthumb://type=AvatarHeadShot&id=1&w=420&h=420'
-targetinfopicture.Parent = targetinfopictureframe
-local targetinfopicturecorner = Instance.new("UICorner")
-targetinfopicturecorner.CornerRadius = UDim.new(0, 128)
-targetinfopicturecorner.Parent = targetinfopicture
-targetinfohealthbar = Instance.new("Frame")
-targetinfohealthbar.Position = UDim2.new(0, 74, 0, 55)
-targetinfohealthbar.BackgroundColor3 = Color3.fromRGB(133, 77, 195)
-targetinfohealthbar.BorderSizePixel = 0
-targetinfohealthbar.Size = UDim2.new(0, 140, 0, 10)
-targetinfohealthbar.Parent = targetinfo
-local targetinfoname = Instance.new("TextLabel")
-targetinfoname.Font = Enum.Font.TitilliumWeb
-targetinfoname.TextSize = 40
-targetinfoname.BackgroundTransparency = 1 
-targetinfoname.TextColor3 = Color3.new(1, 1, 1)
-targetinfoname.Text = "Target info"
-targetinfoname.TextXAlignment = Enum.TextXAlignment.Left
-targetinfoname.Size = UDim2.new(1, -72, 0, 40)
-targetinfoname.TextScaled = true
-targetinfoname.Position = UDim2.new(0, 72, 0, 13)
-targetinfoname.Parent = targetinfo
-local targetinfohealthtext = Instance.new("TextLabel")
-targetinfohealthtext.Font = Enum.Font.TitilliumWeb
-targetinfohealthtext.TextSize = 26
-targetinfohealthtext.BackgroundTransparency = 1 
-targetinfohealthtext.TextColor3 = Color3.new(1, 1, 1)
-targetinfohealthtext.Text = "20.0"
-targetinfohealthtext.TextXAlignment = Enum.TextXAlignment.Left
-targetinfohealthtext.Size = UDim2.new(0, 20, 0, 30)
-targetinfohealthtext.Position = UDim2.new(0, 219, 0, 43)
-targetinfohealthtext.Parent = targetinfo
-local targetinfodamage = Instance.new("Frame")
-targetinfodamage.BackgroundTransparency = 1
-targetinfodamage.BorderSizePixel = 0
-targetinfodamage.BackgroundColor3 = Color3.new(1, 0, 0)
-targetinfodamage.Size = UDim2.new(1, 0, 1, 0)
-targetinfodamage.Parent = targetinfopictureframe
-local targetinfodamagecorner = Instance.new("UICorner")
-targetinfodamagecorner.CornerRadius = UDim.new(0, 128)
-targetinfodamagecorner.Parent = targetinfodamage
-local targetvape = shared.VapeTargetInfo
-local oldupdate = targetvape.UpdateInfo
-local lasthealth = 100
-local lastplr
-local healthanim
-local targetvisible = false
-targetvape.UpdateInfo = function(tab, targetsize)
-	targetvisible = (targetsize > 0)
-	if (targetsize > 0) then
-		pcall(function()
-			targetinfo:TweenSizeAndPosition(UDim2.new(0, 258, 0, 80), UDim2.new(0.5, 72, 0.5, 54), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0, true)
-		end)
-		targetinfo.Visible = true
-	else
-		spawn(function()
-			for i = 1, 30 do 
-				task.wait(0.01)
-				if targetvisible then return end
+if shared.testuirise then
+	shared.testuirise:Remove()
+end
+shared.testuirise = uilib.ScreenGui
+
+local mainframe = Instance.new("Frame")
+mainframe.Size = UDim2.new(0, 548, 0, 300)
+mainframe.BackgroundColor3 = Color3.fromRGB(27, 23, 33)
+mainframe.Position = UDim2.new(0.5, -415, 0.5, -350)
+mainframe.Name = "MainFrame"
+mainframe.Parent = uilib.ScreenGui
+mainframe.ZIndex = 2
+
+dragGUI(mainframe)
+
+local function resizeUI()
+	local screenSize = workspace.CurrentCamera.ViewportSize
+	local newSize = UDim2.new(0, math.min(548, screenSize.X * 0), 0, math.min(300, screenSize.Y * 0))
+	local newPosition = UDim2.new(0.126, 0 -newSize.X.Offset / 0, 0.8, -newSize.Y.Offset / 0)
+
+	mainframe:TweenSize(newSize, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+	mainframe:TweenPosition(newPosition, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+end
+
+workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(resizeUI)
+resizeUI()
+
+local mainframe2 = mainframe:Clone()
+mainframe2.Position = UDim2.new(0, 0, 0, 0)
+mainframe2.Size = UDim2.new(0, 6, 1, 0)
+mainframe2.BorderSizePixel = 0
+mainframe2.Parent = mainframe
+local maincorner = Instance.new("UICorner")
+maincorner.CornerRadius = UDim.new(0, 10)
+maincorner.Parent = mainframe
+local sidebar = Instance.new("Frame")
+sidebar.ZIndex = 1
+sidebar.BackgroundColor3 = Color3.fromRGB(27, 23, 33)
+sidebar.BackgroundTransparency = 0.25
+sidebar.Position = UDim2.new(0, -170, 0, 0)
+sidebar.Size = UDim2.new(0, 176, 1, 0)
+sidebar.Parent = mainframe
+local sidecorner = Instance.new("UICorner")
+sidecorner.CornerRadius = UDim.new(0, 10)
+sidecorner.Parent = sidebar
+local sidebartitle = Instance.new("TextLabel")
+sidebartitle.Size = UDim2.new(1, -6, 0, 50)
+sidebartitle.TextSize = 48
+sidebartitle.Text = "Rise"
+sidebartitle.Font = Enum.Font.SourceSans
+sidebartitle.BackgroundTransparency = 1
+sidebartitle.TextColor3 = Color3.new(1, 1, 1)
+sidebartitle.Position = UDim2.new(0, -20, 0, 2)
+sidebartitle.Parent = sidebar
+local sidebarversion = Instance.new("TextLabel")
+sidebarversion.Size = UDim2.new(1, -6, 0, 50)
+sidebarversion.TextSize = 20
+sidebarversion.Text = "roblox"
+sidebarversion.Font = Enum.Font.SourceSans
+sidebarversion.BackgroundTransparency = 1
+sidebarversion.TextColor3 = Color3.new(1, 1, 1)
+sidebarversion.Position = UDim2.new(0, 39, 0, -6)
+sidebarversion.Parent = sidebar
+local sidebarbuttonframe = Instance.new("Frame")
+sidebarbuttonframe.Size = UDim2.new(1, -6, 1, -56)
+sidebarbuttonframe.Position = UDim2.new(0, 0, 0, 56)
+sidebarbuttonframe.BackgroundTransparency = 1
+sidebarbuttonframe.Parent = sidebar
+local sidebarselected = Instance.new("Frame")
+sidebarselected.Size = UDim2.new(1, 0, 0, 40)
+sidebarselected.BorderSizePixel = 0
+sidebarselected.BackgroundColor3 = Color3.fromRGB(126, 94, 172)
+sidebarselected.Parent = sidebar
+local sidebarbuttonlist = Instance.new("UIListLayout")
+sidebarbuttonlist.Padding = UDim.new()
+sidebarbuttonlist.Parent = sidebarbuttonframe
+
+local categorycount = 1
+function uilib:CreateCategory(categorytab)
+	local labelobjects = {}
+	local categoryapi = {}
+	local sidebarcount = categorycount
+	local sidebarbutton = Instance.new("TextButton")
+	sidebarbutton.Size = UDim2.new(1, 0, 0, 40)
+	sidebarbutton.BackgroundTransparency = 1
+	sidebarbutton.LayoutOrder = #sidebarbuttonframe:GetChildren()
+	sidebarbutton.TextSize = 24
+	sidebarbutton.TextColor3 = Color3.new(1, 1, 1)
+	sidebarbutton.Font = Enum.Font.SourceSans
+	sidebarbutton.ZIndex = 3
+	sidebarbutton.TextXAlignment = Enum.TextXAlignment.Left
+	sidebarbutton.Text = "         "..categorytab.Name
+	sidebarbutton.Parent = sidebarbuttonframe
+	local sidebaricon = Instance.new("TextLabel")
+	sidebaricon.Font = Enum.Font.SourceSans
+	sidebaricon.Text = categorytab.Icon or ""
+	sidebaricon.Size = UDim2.new(0, 40, 0, 40)
+	sidebaricon.TextSize = 20 
+	sidebaricon.BackgroundTransparency =1 
+	sidebaricon.ZIndex = 3
+	sidebaricon.Position = UDim2.new(0, 0, 0, 2)
+	sidebaricon.Parent = sidebarbutton
+	local maincategoryframe = Instance.new("Frame")
+	maincategoryframe.Size = UDim2.new(1, 0, 1, 0)
+	maincategoryframe.Name = categorytab.Name.."CategoryFrame"
+	maincategoryframe.BackgroundTransparency = 1
+	maincategoryframe.ZIndex = 3
+	if categorycount == 1 then
+		sidebarselected.Position = UDim2.new(0, 0, 0, 16 + (sidebarcount * 40))
+	end
+	maincategoryframe.Visible = categorycount == 1
+	maincategoryframe.Parent = mainframe
+	local maincategorytitle = Instance.new("TextLabel")
+	maincategorytitle.Size = UDim2.new(1, 0, 0, 35)
+	maincategorytitle.BackgroundTransparency = 1
+	maincategorytitle.Font = Enum.Font.SourceSansLight
+	maincategorytitle.TextSize = 24
+	maincategorytitle.Text = categorytab.Name
+	maincategorytitle.TextColor3 = Color3.new(1, 1, 1)
+	maincategorytitle.ZIndex = 3
+	maincategorytitle.Parent = maincategoryframe
+	local maincategorybuttonframe = Instance.new("ScrollingFrame")
+	maincategorybuttonframe.Size = UDim2.new(1, -20, 1, -40)
+	maincategorybuttonframe.Position = UDim2.new(0, 10, 0, 40)
+	maincategorybuttonframe.ZIndex = 3
+	maincategorybuttonframe.BackgroundTransparency = 1
+	maincategorybuttonframe.BorderSizePixel = 0
+	maincategorybuttonframe.ScrollBarThickness = 0
+	maincategorybuttonframe.Parent = maincategoryframe
+	local maincategorybuttonframelist = Instance.new("UIListLayout")
+	maincategorybuttonframelist.Parent = (categorytab.Name ~= "Info" and maincategorybuttonframe or nil)
+	maincategorybuttonframelist.Padding = UDim.new(0, 10)
+	maincategorybuttonframelist:GetPropertyChangedSignal("AbsoluteContentSize"):connect(function()
+		maincategorybuttonframe.CanvasSize = UDim2.new(0, 0, 0, maincategorybuttonframelist.AbsoluteContentSize.Y + 10)
+	end)
+	sidebarbutton.MouseButton1Click:connect(function()
+		for i,v in pairs(mainframe:GetChildren()) do 
+			if v.Name:find("CategoryFrame") then 
+				v.Visible = false
 			end
+		end
+		for i2,v2 in pairs(labelobjects) do
 			pcall(function()
-				targetinfo:TweenSizeAndPosition(UDim2.new(0, 0, 0, 0), UDim2.new(0.5, 144, 0.5, 108), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.2, true)
+				v2.TextTransparency = 1
+				game:GetService("TweenService"):Create(v2, TweenInfo.new(1.5), {TextTransparency = 0}):Play()
 			end)
-			for i = 1, 30 do 
-				task.wait(0.01)
-				if targetvisible then return end
-			end
-			targetinfo.Visible = false
-		end)
-	end
-	for i,v in pairs(tab) do
-		local plr = game:GetService("Players"):FindFirstChild(i)
-		if lastplr ~= plr then 
-			lastplr = plr
-		else
-			if v["Health"] < lasthealth then 
-				targetinfopictureframe.Size = UDim2.new(0, 59, 0, 58)
-				targetinfopictureframe:TweenSize(UDim2.new(0, 64, 0, 63), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.4, true)
-				if healthanim then 
-					healthanim:Cancel()
-				end
-				targetinfodamage.BackgroundTransparency = 0.4
-				healthanim = game:GetService("TweenService"):Create(targetinfodamage, TweenInfo.new(0.4), {BackgroundTransparency = 1})
-				healthanim:Play()
-			end
 		end
-		lasthealth = v["Health"]
-		targetinfopicture.Image = 'rbxthumb://type=AvatarHeadShot&id='..v["UserId"]..'&w=420&h=420'
-		targetinfohealthbar:TweenSize(UDim2.new(0, 140 * (v["Health"] / v["MaxHealth"]), 0, 10), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true)
-		local healthtext = (math.floor((v["Health"] / 5) * 10) / 10)
-		targetinfohealthtext.Text = healthtext..(tostring(healthtext):len() < 3 and ".0" or "")
-		targetinfoname.Text = plr and plr.DisplayName or "Player"
-	end
-	return oldupdate(tab, targetsize)
-end
-
-
-local risetext = Instance.new("TextLabel")
-risetext.Text = "Rise x Voidware"
-risetext.Font = Enum.Font.TitilliumWeb
-risetext.TextSize = 53
-risetext.TextColor3 = Color3.new(1, 1, 1)
-risetext.BackgroundTransparency = 1
-risetext.TextYAlignment = Enum.TextYAlignment.Top
-risetext.TextXAlignment = Enum.TextXAlignment.Left
-risetext.Size = UDim2.new(0, 400, 0, 60)
-risetext.Position = UDim2.new(0, 6, 0, -10)
-risetext.Parent = guilib.ScreenGui
-local risetext2 = risetext:Clone()
-risetext2.TextColor3 = Color3.new(0, 0, 0)
-risetext2.Position = UDim2.new(0, 1, 0, 1)
-risetext2.ZIndex = 0
-risetext2.TextTransparency = 0.65
-risetext2.Parent = risetext
-local risegradient = Instance.new("UIGradient")
-risegradient.Rotation = 180
-risegradient.Parent = risetext
-local risetextversion = risetext:Clone()
-local risetextcustom = risetext:Clone()
-risetextversion.TextSize = 26
-risetextversion.Text = "3.0"
-risetextversion.Position = UDim2.new(0, 230, 0, 6)
-risetextversion.Parent = risetext
-risetextversion.TextLabel.TextSize = 26
-risetextversion.TextLabel.Text = risetextversion.Text
-risetextcustom.TextSize = 26
-risetextcustom.Text = riseoptions.CustomText or ""
-risetextcustom.Position = UDim2.new(0, 66, 0, 22)
-risetextcustom.Parent = risetext
-risetextcustom.TextLabel.TextSize = 26
-risetextcustom.TextLabel.Text = risetextcustom.Text
-
-pcall(function()
-	for i,v in pairs(getconnections(game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.OnNewMessage.OnClientEvent)) do
-		if v.Function and #debug.getupvalues(v.Function) > 0 and type(debug.getupvalues(v.Function)[1]) == "table" and getmetatable(debug.getupvalues(v.Function)[1]) and getmetatable(debug.getupvalues(v.Function)[1]).GetChannel then
-			oldfunc = getmetatable(debug.getupvalues(v.Function)[1].ChatBar.CommandProcessor).ProcessCompletedChatMessage
-			oldtab = getmetatable(debug.getupvalues(v.Function)[1].ChatBar.CommandProcessor)
-			getmetatable(debug.getupvalues(v.Function)[1].ChatBar.CommandProcessor).ProcessCompletedChatMessage = function(self, message, chatwindow)
-				local res = oldfunc(self, message, chatwindow)
-				if message:sub(1, 5) == ".bind" then
-					local args = message:split(" ")
-					table.remove(args, 1)
-					if #args >= 2 then
-						local module = VapeGui["ObjectsThatCanBeSaved"][args[1].."OptionsButton"]
-						print(module)
-						if module then 
-							local suc, res = pcall(function() return Enum.KeyCode[args[2]] end)
-							print(suc, res)
-							if suc or args[2] == "None" then
-								local oldiden = getthreadidentityfunc()
-								setthreadidentityfunc(8)
-								module["Api"]["SetKeybind"](suc and res.Name or "")
-								VapeGui["CreateNotification"]("", "Set "..args[1].."'s bind to "..args[2]:upper()..".", 5)
-								setthreadidentityfunc(oldiden)
-							end
-						end
-					end
-					return true
-				elseif message:sub(1, 11) == ".clientname" then
-					local args = message:split(" ")
-					table.remove(args, 1)
-					if #args >= 1 then
-						local oldiden = getthreadidentityfunc()
-						setthreadidentityfunc(8)
-						local clientname = ""
-						for i,v in pairs(args) do clientname = clientname..v.." " end
-						risetextcustom.Text = clientname
-						risetextcustom.TextLabel.Text = clientname
-						riseoptions.CustomText = clientname
-						setthreadidentityfunc(oldiden)
-					end
-					return true
-				end
-				return res
-			end
-		end
-	end
-end)
-
-spawn(function()
-	local val = 0
-	repeat
-		task.wait(0.01)
-		local tab = {}
-		val = val + 0.001
-		if val > 1 then 
-
-			val = val - 1
-		end
-		for i = 1, 10 do 
-			table.insert(tab, ColorSequenceKeypoint.new(((i / 10) + val) % 1, i % 2 == 0 and risethemes[riseoptions.Theme].TextGUIColor2 or risethemes[riseoptions.Theme].TextGUIColor1))
-		end
-		table.sort(tab, function(a, b)
-			return a.Time < b.Time
-		end)
-		local tab2 = {}
-		for i2,v2 in pairs(tab) do 
-			if i2 == 1 and v2.Time ~= 0 then 
-				local lastcolor = tab[1].Value:lerp(tab[#tab].Value, math.clamp((tab[#tab].Time - 0.9) * 10, 0, 1))
-				table.insert(tab2, ColorSequenceKeypoint.new(0, lastcolor:lerp(v2.Value, (v2.Time * 10) - 1)))
-			elseif i2 == #tab and v2.Time ~= 1 then 
-				table.insert(tab2, ColorSequenceKeypoint.new(1, tab[1].Value:lerp(v2.Value, math.clamp((v2.Time - 0.9) * 10, 0, 1))))
-			end
-			table.insert(tab2, v2)
-		end
-		table.sort(tab2, function(a, b)
-			return a.Time < b.Time
-		end)
-		pcall(function()
-			risegradient.Color = ColorSequence.new(tab2)
-			risetextversion.UIGradient.Color = ColorSequence.new(tab2)
-			risetextcustom.UIGradient.Color = ColorSequence.new(tab2)
-		end)
-	until guilib.ScreenGui == nil or guilib.ScreenGui.Parent == nil
-end)
-
-local risearraylist = Instance.new("Frame")
-risearraylist.Size = UDim2.new(1, 0, 1, 0)
-risearraylist.Position = UDim2.new(0, -10, 0, 10)
-risearraylist.BackgroundTransparency = 1
-risearraylist.Parent = guilib.ScreenGui
-local risearraylistlayout = Instance.new("UIListLayout")
-risearraylistlayout.VerticalAlignment = Enum.VerticalAlignment.Top
-risearraylistlayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
-risearraylistlayout.SortOrder = Enum.SortOrder.LayoutOrder
-risearraylistlayout.Parent = risearraylist
-local newnum = 0
-
-local function refreshbars(textlists)
-	local size = 0
-	for i3,v3 in pairs(textlists) do 
-		size = size + 22
-	end
-	risearraylistlayout.Parent = nil
-	risearraylist:ClearAllChildren()
-	risearraylistlayout.Parent = risearraylist
-	for i2,v2 in pairs(textlists) do
-		local newstr = v2.Text:gsub(":", " ")
-		local textsize = v2.Size or Vector2.new(0, 0)
-		local calcnum = (newnum + (i2 / 10)) % 2
-		local frame = Instance.new("TextLabel")
-		frame.BorderSizePixel = 0
-		frame.BackgroundTransparency = 0.62
-		frame.Text = newstr
-		frame.TextSize = 30
-		frame.TextColor3 = Color3.new(1, 0, 0)
-		if calcnum < 1 then 
-			frame.TextColor3 = risethemes[riseoptions.Theme].TextGUIColor1:lerp(risethemes[riseoptions.Theme].TextGUIColor2, calcnum)
-		elseif calcnum < 2 then 
-			frame.TextColor3 = risethemes[riseoptions.Theme].TextGUIColor2:lerp(risethemes[riseoptions.Theme].TextGUIColor1, calcnum - 1)
-		else
-			frame.TextColor3 = risethemes[riseoptions.Theme].TextGUIColor1
-		end
-		frame.Font = Enum.Font.TitilliumWeb
-		frame.BackgroundColor3 = Color3.new(0,0,0)
-		frame.Visible = true
-		frame.ZIndex = (#textlists - i2) + 1
-		frame.LayoutOrder = i2
-		frame.Size = UDim2.new(0, textsize.X + 10, 0, 22)
-		frame.Parent = risearraylist
-		if i2 == 1 then 
-			local image = Instance.new("ImageLabel")
-			image.Size = UDim2.new(1, 0, 0, 6)
-			image.ImageTransparency = 0
-			image.Position = UDim2.new(0, 0, 0, -6)
-			image.Rotation = 180
-			image.BackgroundTransparency = 1
-			image.ImageColor3 = Color3.new(0, 0, 0)
-			image.ZIndex = 0
-			image.Image = getcustomassetfunc("rise/assets/WindowBlurLine.png")
-			image.BorderSizePixel = 0
-			image.Parent = frame
-			local imagecorner1 = Instance.new("ImageLabel")
-			imagecorner1.Size = UDim2.new(0, 6, 0, 6)
-			imagecorner1.ImageTransparency = 0
-			imagecorner1.Position = UDim2.new(0, -6, 0, -6)
-			imagecorner1.BackgroundTransparency = 1
-			imagecorner1.ImageColor3 = Color3.new(0, 0, 0)
-			imagecorner1.ZIndex = 0
-			imagecorner1.Image = getcustomassetfunc("rise/assets/WindowBlurCorner.png")
-			imagecorner1.BorderSizePixel = 0
-			imagecorner1.Parent = frame
-			local imagecorner2 = Instance.new("ImageLabel")
-			imagecorner2.Size = UDim2.new(0, 6, 0, 6)
-			imagecorner2.ImageTransparency = 0
-			imagecorner2.Position = UDim2.new(1, 0, 0, -6)
-			imagecorner2.Rotation = 90
-			imagecorner2.BackgroundTransparency = 1
-			imagecorner2.ImageColor3 = Color3.new(0, 0, 0)
-			imagecorner2.ZIndex = 0
-			imagecorner2.Image = getcustomassetfunc("rise/assets/WindowBlurCorner.png")
-			imagecorner2.BorderSizePixel = 0
-			imagecorner2.Parent = frame
-			local imagerightline = Instance.new("ImageLabel")
-			imagerightline.Size = UDim2.new(0, 6, 0, size)
-			imagerightline.ImageTransparency = 0
-			imagerightline.Position = UDim2.new(1, 0, 0, 0)
-			imagerightline.Rotation = 180
-			imagerightline.BackgroundTransparency = 1
-			imagerightline.ImageColor3 = Color3.new(0, 0, 0)
-			imagerightline.ZIndex = 0
-			imagerightline.Image = getcustomassetfunc("rise/assets/WindowBlurLine2.png")
-			imagerightline.BorderSizePixel = 0
-			imagerightline.Parent = frame
-		end
-		if i2 == #textlists then 
-			local imagecorner4 = Instance.new("ImageLabel")
-			imagecorner4.Size = UDim2.new(0, 6, 0, 6)
-			imagecorner4.ImageTransparency = 0
-			imagecorner4.Position = UDim2.new(1, 0, 1, 0)
-			imagecorner4.BackgroundTransparency = 1
-			imagecorner4.Rotation = 180
-			imagecorner4.ImageColor3 = Color3.new(0, 0, 0)
-			imagecorner4.ZIndex = 0
-			imagecorner4.Image = getcustomassetfunc("rise/assets/WindowBlurCorner.png")
-			imagecorner4.BorderSizePixel = 0
-			imagecorner4.Parent = frame
-		end
-		local imagecorner3 = Instance.new("ImageLabel")
-		imagecorner3.Size = UDim2.new(0, 6, 0, 6)
-		imagecorner3.ImageTransparency = 0
-		imagecorner3.Position = UDim2.new(0, -6, 1, 0)
-		imagecorner3.BackgroundTransparency = 1
-		imagecorner3.Rotation = 270
-		imagecorner3.ImageColor3 = Color3.new(0, 0, 0)
-		imagecorner3.ZIndex = 0
-		imagecorner3.Image = getcustomassetfunc("rise/assets/WindowBlurCorner.png")
-		imagecorner3.BorderSizePixel = 0
-		imagecorner3.Parent = frame
-		local imagebottom = Instance.new("ImageLabel")
-		if i2 ~= #textlists then
-			local nextone = textlists[i2 + 1]
-			local textsize = nextone.Size + Vector2.new(10, 0)
-			imagebottom.Size = UDim2.new(0, math.clamp((frame.Size.X.Offset - textsize.X) - 1, 0, 1000), 0, 6)
-		else
-			imagebottom.Size = UDim2.new(1, 0, 0, 6)
-		end
-		imagebottom.ImageTransparency = 0
-		imagebottom.Position = UDim2.new(0, 0, 1, 0)
-		imagebottom.Rotation = 0
-		imagebottom.BackgroundTransparency = 1
-		imagebottom.ImageColor3 = Color3.new(0, 0, 0)
-		imagebottom.ZIndex = 0
-		imagebottom.Image = getcustomassetfunc("rise/assets/WindowBlurLine.png")
-		imagebottom.BorderSizePixel = 0
-		imagebottom.Parent = frame
-		local imageleftline = Instance.new("ImageLabel")
-		imageleftline.Size = UDim2.new(0, 6, 1, 0)
-		imageleftline.ImageTransparency = 0
-		imageleftline.Position = UDim2.new(0, -6, 0, 0)
-		imageleftline.Rotation = 0
-		imageleftline.BackgroundTransparency = 1
-		imageleftline.ImageColor3 = Color3.new(0, 0, 0)
-		imageleftline.ZIndex = 0
-		imageleftline.Image = getcustomassetfunc("rise/assets/WindowBlurLine2.png")
-		imageleftline.BorderSizePixel = 0
-		imageleftline.Parent = frame
-	end
-end
-
-local function UpdateHud()
-	local text = ""
-	local text2 = ""
-	local tableofmodules = {}
-	local sizes = {}
-	local first = true
-
-	for i,v in pairs(VapeGui["ObjectsThatCanBeSaved"]) do
-		if v["Type"] == "OptionsButton" and v["Api"]["Name"] ~= "Text GUI" then
-			if v["Api"]["Enabled"] then
-				if not riseoptions.ShowRenderModules then
-					if v["Object"].Parent.Parent.Name == "Render" then continue end
-				end
-				table.insert(tableofmodules, {["Text"] = v["Api"]["Name"], ["ExtraText"] = v["Api"]["GetExtraText"]})
-				sizes[v["Api"]["Name"]] = game:GetService("TextService"):GetTextSize(v["Api"]["Name"], 30, Enum.Font.TitilliumWeb, Vector2.new(1000000, 1000000))
-			end
-		end
-	end
-	table.sort(tableofmodules, function(a, b) 
-		textsize1 = sizes[a["Text"]]
-		textsize2 = sizes[b["Text"]]
-		return textsize1.X > textsize2.X 
+		maincategoryframe.Visible = true
+		sidebarselected:TweenPosition(UDim2.new(0, 0, 0, 16 + (sidebarcount * 40)), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true)
 	end)
-	local textlists = {}
-	for i2,v2 in pairs(tableofmodules) do
-		table.insert(textlists, {Text = v2["Text"], Size = sizes[v2["Text"]] or Vector2.new(0, 0)})
+	categorycount = categorycount + 1
+
+	function categoryapi:CreateLabel()
+		local lab = Instance.new("TextLabel")
+		labelobjects[#labelobjects + 1] = lab
+		lab.Parent = maincategorybuttonframe
+		lab.ZIndex = 4
+		return lab
 	end
-	refreshbars(textlists)
-end
 
-UpdateHud()
-VapeGui["UpdateHudEvent"].Event:connect(UpdateHud)
-spawn(function()
-	repeat 
-		task.wait(0.01)
-		newnum = (newnum + 0.01) % 2
-	until guilib.ScreenGui == nil or guilib.ScreenGui.Parent == nil
-end)
-
-spawn(function()
-	repeat 
-		task.wait(0.01)
-		local num = newnum
-		local list = risearraylist:GetChildren()
-		table.remove(list, table.find(list, risearraylistlayout))
-		for i,v in pairs(list) do
-			local calcnum = (newnum + (i / 10)) % 2
-			if calcnum < 1 then 
-				v.TextColor3 = risethemes[riseoptions.Theme].TextGUIColor1:lerp(risethemes[riseoptions.Theme].TextGUIColor2, calcnum)
-			elseif calcnum < 2 then 
-				v.TextColor3 = risethemes[riseoptions.Theme].TextGUIColor2:lerp(risethemes[riseoptions.Theme].TextGUIColor1, calcnum - 1)
-			else
-				v.TextColor3 = risethemes[riseoptions.Theme].TextGUIColor1
+	function categoryapi:CreateButton(buttontab)
+		local hoveranim
+		local buttonapi = {}
+		local optionsbuttonlayoutorder = #maincategorybuttonframe:GetChildren() + 1
+		local optionsbutton = Instance.new("TextButton")
+		optionsbutton.BackgroundColor3 = Color3.fromRGB(37, 36, 44)
+		optionsbutton.Size = UDim2.new(1, 0, 0, 40)
+		optionsbutton.AutoButtonColor = false
+		optionsbutton.ZIndex = 3
+		optionsbutton.LayoutOrder = optionsbuttonlayoutorder
+		optionsbutton.TextSize = 24
+		optionsbutton.TextColor3 = Color3.fromRGB(170, 170, 170)
+		optionsbutton.Font = Enum.Font.SourceSansLight
+		optionsbutton.TextXAlignment = Enum.TextXAlignment.Left
+		optionsbutton.Text = ""
+		optionsbutton.Parent = maincategorybuttonframe
+		local optionsbuttontext = Instance.new("TextLabel")
+		optionsbuttontext.BackgroundTransparency = 1 
+		optionsbuttontext.Text = "   "..buttontab.Name
+		optionsbuttontext.ZIndex = 3
+		optionsbuttontext.TextSize = 24
+		optionsbuttontext.TextColor3 = Color3.fromRGB(170, 170, 170)
+		optionsbuttontext.Size = UDim2.new(1, 0, 0, 40)
+		optionsbuttontext.Font = Enum.Font.SourceSansLight
+		optionsbuttontext.TextXAlignment = Enum.TextXAlignment.Left
+		optionsbuttontext.Parent = optionsbutton
+		local optionsbuttoncorner = Instance.new("UICorner")
+		optionsbuttoncorner.CornerRadius = UDim.new(0, 4)
+		optionsbuttoncorner.Parent = optionsbutton
+		local optionsbuttontoggle1 = Instance.new("Frame")
+		optionsbuttontoggle1.Size = UDim2.new(0, 20, 0, 10)
+		optionsbuttontoggle1.Position = UDim2.new(1, -30, 0, 16)
+		optionsbuttontoggle1.ZIndex = 3
+		optionsbuttontoggle1.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+		optionsbuttontoggle1.Parent = optionsbutton
+		optionsbuttontoggle1.Active = false
+		local optionsbuttontoggle1corner = Instance.new("UICorner")
+		optionsbuttontoggle1corner.CornerRadius = UDim.new(0, 8)
+		optionsbuttontoggle1corner.Parent = optionsbuttontoggle1
+		local optionsbuttontoggle2 = optionsbuttontoggle1:Clone()
+		optionsbuttontoggle2.Size = UDim2.new(0, 14, 0, 14)
+		optionsbuttontoggle2.BackgroundColor3 = Color3.fromRGB(83, 66, 111)
+		optionsbuttontoggle2.Position = UDim2.new(0, -2, 0, -2)
+		optionsbuttontoggle2.Parent = optionsbuttontoggle1
+		local optionsbuttonhoverbox = Instance.new("Frame")
+		optionsbuttonhoverbox.ZIndex = 4
+		optionsbuttonhoverbox.Active = false
+		optionsbuttonhoverbox.BackgroundTransparency = 1
+		optionsbuttonhoverbox.Size = UDim2.new(1, 0, 0, 40)
+		optionsbuttonhoverbox.Parent = optionsbutton
+		local optionsbuttonhovertext = Instance.new("TextLabel")
+		optionsbuttonhovertext.Text = buttontab.HoverText or ""
+		optionsbuttonhovertext.BackgroundTransparency = 1
+		local calculatedsize = game:GetService("TextService"):GetTextSize(optionsbuttontext.Text, optionsbuttontext.TextSize, optionsbuttontext.Font, Vector2.new(1000000, 1000000))
+		optionsbuttonhovertext.Size = UDim2.new(1, -(calculatedsize.X + 10), 0, 40)
+		optionsbuttonhovertext.Position = UDim2.new(0, (calculatedsize.X + 10), 0, 0)
+		optionsbuttonhovertext.Active = false
+		optionsbuttonhovertext.TextXAlignment = Enum.TextXAlignment.Left
+		optionsbuttonhovertext.TextColor3 = Color3.fromRGB(100, 100, 100)
+		optionsbuttonhovertext.TextSize = 20
+		optionsbuttonhovertext.TextTransparency = 1
+		optionsbuttonhovertext.Font = Enum.Font.SourceSansLight
+		optionsbuttonhovertext.ZIndex = 3
+		optionsbuttonhovertext.Parent = optionsbutton
+		local optionsbuttonchildren = Instance.new("Frame")
+		optionsbuttonchildren.Size = UDim2.new(1, 0, 0, 0)
+		optionsbuttonchildren.Position = UDim2.new(0, 0, 0, 40)
+		optionsbuttonchildren.BackgroundTransparency = 1
+		optionsbuttonchildren.Visible = false
+		optionsbuttonchildren.Parent = optionsbutton
+		local optionsbuttonchildrenlist = Instance.new("UIListLayout")
+		optionsbuttonchildrenlist.SortOrder = Enum.SortOrder.LayoutOrder
+		optionsbuttonchildrenlist.Parent = optionsbuttonchildren
+		optionsbuttonchildrenlist:GetPropertyChangedSignal("AbsoluteContentSize"):connect(function()
+			optionsbuttonchildren.Size = UDim2.new(1, 0, 0, optionsbuttonchildrenlist.AbsoluteContentSize.Y)
+			optionsbutton.Size = UDim2.new(1, 0, 0, optionsbuttonchildren.Visible and 40 + optionsbuttonchildren.Size.Y.Offset or 40)
+		end)
+		optionsbuttonhoverbox.MouseEnter:connect(function()
+			if hoveranim then
+				hoveranim:Cancel()
 			end
-		end
-	until guilib.ScreenGui == nil or guilib.ScreenGui.Parent == nil
-end)
-
-local Interface = windowtabs.Render:CreateButton({
-	Name = "Interface",
-	Function = function() end
-})
-local risethemelist = {}
-for i,v in pairs(risethemes) do table.insert(risethemelist, i) end
-local InterfaceTheme = Interface:CreateDropdown({
-	Name = "Theme",
-	List = risethemelist,
-	Function = function(val)
-		riseoptions.Theme = val
-	end
-})
-local InterfaceRenderR = Interface:CreateSlider({
-	Name = "Red",
-	Min = 0,
-	Max = 255,
-	Function = function(val)
-		riseoptions.R = val / 255
-		risethemes.Rise.TextGUIColor1 = Color3.new(riseoptions.R, riseoptions.G, riseoptions.B)
-		local h, s, v = Color3.toHSV(risethemes.Rise.TextGUIColor1)
-		risethemes.Rise.TextGUIColor2 = Color3.fromHSV(h, s, math.clamp(v - 0.3, 0, 1))
-	end
-})
-local InterfaceRenderG = Interface:CreateSlider({
-	Name = "Green",
-	Min = 0,
-	Max = 255,
-	Function = function(val)
-		riseoptions.G = val / 255
-		risethemes.Rise.TextGUIColor1 = Color3.new(riseoptions.R, riseoptions.G, riseoptions.B)
-		local h, s, v = Color3.toHSV(risethemes.Rise.TextGUIColor1)
-		risethemes.Rise.TextGUIColor2 = Color3.fromHSV(h, s, math.clamp(v - 0.3, 0, 1))
-	end
-})
-local InterfaceRenderB = Interface:CreateSlider({
-	Name = "Blue",
-	Min = 0,
-	Max = 255,
-	Function = function(val)
-		riseoptions.B = val / 255
-		risethemes.Rise.TextGUIColor1 = Color3.new(riseoptions.R, riseoptions.G, riseoptions.B)
-		local h, s, v = Color3.toHSV(risethemes.Rise.TextGUIColor1)
-		risethemes.Rise.TextGUIColor2 = Color3.fromHSV(h, s, math.clamp(v - 0.3, 0, 1))
-	end
-})
-local InterfaceRenderNotifications = Interface:CreateToggle({
-	Name = "Show Notifications on Toggle",
-	Function = function(callback)
-		riseoptions.RenderToggle = callback
-	end
-})
-local InterfaceRenderList = Interface:CreateToggle({
-	Name = "Show Render Modules on List",
-	Function = function(callback)
-		riseoptions.ShowRenderModules = callback
-		VapeGui["UpdateHudEvent"]:Fire()
-	end
-})
-
-
-local function isAlive(plr)
-	if plr then
-		return plr and plr.Character and plr.Character.Parent ~= nil and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Head") and plr.Character:FindFirstChild("Humanoid")
-	end
-	return lplr and lplr.Character and lplr.Character.Parent ~= nil and lplr.Character:FindFirstChild("HumanoidRootPart") and lplr.Character:FindFirstChild("Head") and lplr.Character:FindFirstChild("Humanoid")
-end
-
-local NameTagsFolder = Instance.new("Folder")
-NameTagsFolder.Name = "NameTagsFolder"
-NameTagsFolder.Parent = VapeGui["MainGui"]
-local nametagsfolderdrawing = {}
-nametagconnection = players.PlayerRemoving:connect(function(plr)
-	if NameTagsFolder:FindFirstChild(plr.Name) then
-		NameTagsFolder[plr.Name]:Remove()
-	end
-	if nametagsfolderdrawing[plr.Name] then 
-		pcall(function()
-			nametagsfolderdrawing[plr.Name].Text:Remove()
-			nametagsfolderdrawing[plr.Name].BG:Remove()
-			nametagsfolderdrawing[plr.Name] = nil
+			hoveranim = game:GetService("TweenService"):Create(optionsbuttonhovertext, TweenInfo.new(0.6), {TextTransparency = 0})
+			hoveranim:Play()
 		end)
-	end
-end)
-local NameTags = windowtabs.Render:CreateButton({
-	Name = "RiseNameTags",
-	Function = function(callback)
-		riseoptions.NameTags = callback
-		if callback then 
-			BindToRenderStep("NameTags", 500, function()
-				for i,plr in pairs(players:GetChildren()) do
-					local thing
-					if NameTagsFolder:FindFirstChild(plr.Name) then
-						thing = NameTagsFolder[plr.Name]
-						thing.Visible = false
-					else
-						thing = Instance.new("TextLabel")
-						thing.BackgroundTransparency = 0.5
-						thing.BackgroundColor3 = Color3.new(0, 0, 0)
-						thing.BorderSizePixel = 0
-						thing.Visible = false
-						thing.RichText = true
-						thing.TextYAlignment = Enum.TextYAlignment.Top
-						thing.Name = plr.Name
-						thing.Font = Enum.Font.Gotham
-						thing.TextSize = 16
-						thing.TextColor3 = Color3.new(1, 1, 1)
-						thing.Parent = NameTagsFolder
-						local healthbar = Instance.new("Frame")
-						healthbar.BorderSizePixel = 0
-						healthbar.Size = UDim2.new(1, 0, 0, 2)
-						healthbar.Position = UDim2.new(0, 0, 1, -2)
-						healthbar.Parent = thing
-					end
+		optionsbuttonhoverbox.MouseLeave:connect(function()
+			if hoveranim then
+				hoveranim:Cancel()
+			end
+			hoveranim = game:GetService("TweenService"):Create(optionsbuttonhovertext, TweenInfo.new(0.6), {TextTransparency = 1})
+			hoveranim:Play()
+		end)
+		buttonapi.Enabled = false
 
-					if plr then
-						if isAlive(plr) and plr:GetAttribute("Team") ~= lplr:GetAttribute("Team") and plr ~= lplr then
-							local headPos, headVis = workspace.CurrentCamera:WorldToViewportPoint((plr.Character.HumanoidRootPart:GetRenderCFrame() * CFrame.new(0, plr.Character.Head.Size.Y + plr.Character.HumanoidRootPart.Size.Y, 0)).Position)
+		function buttonapi:ToggleButton(clicked, enabled)
+			if enabled ~= nil then
+				buttonapi.Enabled = enabled and true or false
+			else
+				buttonapi.Enabled = (not buttonapi.Enabled)
+			end
+			buttontab.Function(buttonapi.Enabled)
+			optionsbuttontoggle2.Position = buttonapi.Enabled and UDim2.new(0, 8, 0, -2) or UDim2.new(0, -2, 0, -2)
+			optionsbuttontoggle2.BackgroundColor3 = buttonapi.Enabled and Color3.fromRGB(107, 79, 146) or Color3.fromRGB(83, 66, 111)
+			optionsbuttontext.TextColor3 = buttonapi.Enabled and Color3.fromRGB(126, 94, 172) or Color3.fromRGB(170, 170, 170)
+			optionsbutton.BackgroundColor3 = buttonapi.Enabled and Color3.fromRGB(36, 32, 42) or Color3.fromRGB(37, 36, 44)
+			optionsbuttontoggle1.BackgroundColor3 = buttonapi.Enabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 180, 180)
+		end
 
-							if headVis then
-								local displaynamestr = plr.DisplayName or plr.Name
-								local nametagSize = game:GetService("TextService"):GetTextSize(displaynamestr, thing.TextSize, thing.Font, Vector2.new(100000, 100000))
-								thing.Size = UDim2.new(0, nametagSize.X + 30, 0, nametagSize.Y + 4)
-								thing.Text = displaynamestr
-								thing.TextColor3 = Color3.new(1, 1, 1)
-								thing.Visible = headVis
-								thing.Position = UDim2.new(0, headPos.X - thing.Size.X.Offset / 2, 0, (headPos.Y - thing.Size.Y.Offset) - 36)
-								thing.Frame.BackgroundColor3 = universalcolor
-								thing.Frame.Size = UDim2.new(math.clamp(plr.Character.Humanoid.Health / plr.Character.Humanoid.MaxHealth, 0, 1), 0, 0, 2)
-							end
-						end
-					end
+		function buttonapi:CreateToggle(buttontab2)
+			local buttonapi2 = {}
+			local togglelayoutorder = #optionsbuttonchildren:GetChildren() + 1
+			local toggleframe1 = Instance.new("TextButton")
+			toggleframe1.LayoutOrder = togglelayoutorder
+			toggleframe1.Size = UDim2.new(1, 0, 0, 30)
+			toggleframe1.Text = ""
+			toggleframe1.BackgroundTransparency = 1
+			toggleframe1.ZIndex = 4
+			toggleframe1.Parent = optionsbuttonchildren
+			local toggletext = Instance.new("TextLabel")
+			toggletext.Text = "   "..buttontab2.Name
+			toggletext.TextSize = 22
+			toggletext.ZIndex = 4
+			toggletext.TextColor3 = Color3.fromRGB(190, 190, 190)
+			toggletext.Font = Enum.Font.SourceSansLight
+			toggletext.TextXAlignment = Enum.TextXAlignment.Left
+			toggletext.BackgroundTransparency = 1
+			toggletext.Size = UDim2.new(1, 0, 1, 0)
+			toggletext.Parent = toggleframe1
+			local calculatedsizetoggle = game:GetService("TextService"):GetTextSize(toggletext.Text, toggletext.TextSize, toggletext.Font, Vector2.new(1000000, 1000000))
+			local toggleframe2 = Instance.new("Frame")
+			toggleframe2.Size = UDim2.new(0, 16, 0, 16)
+			toggleframe2.Position = UDim2.new(0, calculatedsizetoggle.X + 10, 0, 8)
+			toggleframe2.BackgroundColor3 = Color3.fromRGB(111, 88, 145)
+			toggleframe2.ZIndex = 4
+			toggleframe2.Parent = toggleframe1
+			local toggleframe2corner = Instance.new("UICorner")
+			toggleframe2corner.CornerRadius = UDim.new(0, 16)
+			toggleframe2corner.Parent = toggleframe2
+			local toggleframe3 = toggleframe2:Clone()
+			toggleframe3.BackgroundColor3 = optionsbutton.BackgroundColor3
+			toggleframe3.Size = UDim2.new(1, -4, 1, -4)
+			toggleframe3.Position = UDim2.new(0, 2, 0, 2)
+			toggleframe3.Parent = toggleframe2
+			local toggleframe4 = toggleframe2:Clone()
+			toggleframe4.BackgroundColor3 = Color3.fromRGB(111, 88, 145)
+			toggleframe4.Size = UDim2.new(1, -8, 1, -8)
+			toggleframe4.Position = UDim2.new(0, 4, 0, 4)
+			toggleframe4.Parent = toggleframe2
+			toggleframe4.ZIndex = 5
+			toggleframe4.Visible = false
+			buttonapi2.Enabled = false
+			buttonapi2.Object = toggleframe1
+
+			function buttonapi2:ToggleButton(clicked, enabled2)
+				if enabled2 ~= nil then
+					buttonapi2.Enabled = enabled2 and true or false
+				else
+					buttonapi2.Enabled = (not buttonapi2.Enabled)
 				end
+				buttontab2.Function(buttonapi2.Enabled)
+				toggleframe4.Visible = buttonapi2.Enabled
+			end
+
+			function buttonapi2:SetLayoutOrder(order)
+				toggleframe1.LayoutOrder = order
+			end
+
+			toggleframe1.MouseButton1Click:connect(function()
+				buttonapi2:ToggleButton(true)
 			end)
-		else
-			UnbindFromRenderStep("NameTags")
-			NameTagsFolder:ClearAllChildren()
-		end
-	end,
-	HoverText = ""
-})
 
-local function LoadSettings()
-	local suc, res = pcall(function() return game:GetService("HttpService"):JSONDecode(readfile("rise/settings.json")) end)
-	if suc and type(res) == "table" then 
-		if risethemes[res.Theme] == nil then
-			res.Theme = "Rise Blend"
+			optionsbutton:GetPropertyChangedSignal("BackgroundColor3"):connect(function()
+				if toggleframe3 then 
+					toggleframe3.BackgroundColor3 = optionsbutton.BackgroundColor3
+				end 
+			end)
+			return buttonapi2
 		end
-		riseoptions = res
-		if InterfaceTheme then 
-			InterfaceTheme:SetValue(riseoptions.Theme)
+
+		function buttonapi:CreateSlider(buttontab2)
+			local buttonapi2 = {}
+			local togglelayoutorder = #optionsbuttonchildren:GetChildren() + 1
+			local toggleframe1 = Instance.new("Frame")
+			toggleframe1.LayoutOrder = togglelayoutorder
+			toggleframe1.Size = UDim2.new(1, 0, 0, 30)
+			toggleframe1.BackgroundTransparency = 1
+			toggleframe1.ZIndex = 4
+			toggleframe1.Parent = optionsbuttonchildren
+			local toggletext = Instance.new("TextLabel")
+			toggletext.Text = "   "..buttontab2.Name
+			toggletext.TextSize = 22
+			toggletext.ZIndex = 4
+			toggletext.TextColor3 = Color3.fromRGB(190, 190, 190)
+			toggletext.Font = Enum.Font.SourceSansLight
+			toggletext.TextXAlignment = Enum.TextXAlignment.Left
+			toggletext.BackgroundTransparency = 1
+			toggletext.Size = UDim2.new(1, 0, 1, 0)
+			toggletext.Parent = toggleframe1
+			local calculatedsizetoggle = game:GetService("TextService"):GetTextSize(toggletext.Text, toggletext.TextSize, toggletext.Font, Vector2.new(1000000, 1000000))
+			local toggleframe2 = Instance.new("Frame")
+			toggleframe2.Size = UDim2.new(0, 200, 0, 4)
+			toggleframe2.Position = UDim2.new(0, calculatedsizetoggle.X + 14, 0, 15)
+			toggleframe2.BackgroundColor3 = Color3.fromRGB(111, 88, 145)
+			toggleframe2.BorderSizePixel = 0
+			toggleframe2.ZIndex = 4
+			toggleframe2.Parent = toggleframe1
+			local toggleframe3 = Instance.new("TextButton")
+			toggleframe3.Size = UDim2.new(0, 10, 0, 10)
+			toggleframe3.Position = UDim2.new(0, -3, 0, -3)
+			toggleframe3.BackgroundColor3 = Color3.fromRGB(130, 100, 174)
+			toggleframe3.BorderSizePixel = 0
+			toggleframe3.AutoButtonColor = false
+			toggleframe3.Text = ""
+			toggleframe3.ZIndex = 4
+			toggleframe3.Parent = toggleframe2
+			local toggletext2 = Instance.new("TextLabel")
+			toggletext2.Text = "0"
+			toggletext2.TextSize = 22
+			toggletext2.ZIndex = 4
+			toggletext2.TextColor3 = Color3.fromRGB(190, 190, 190)
+			toggletext2.Font = Enum.Font.SourceSansLight
+			toggletext2.TextXAlignment = Enum.TextXAlignment.Left
+			toggletext2.Position = UDim2.new(0, calculatedsizetoggle.X + 223, 0, 0)
+			toggletext2.BackgroundTransparency = 1
+			toggletext2.Size = UDim2.new(1, 0, 1, 0)
+			toggletext2.Parent = toggleframe1
+			local toggleframe3corner = Instance.new("UICorner")
+			toggleframe3corner.CornerRadius = UDim.new(0, 16)
+			toggleframe3corner.Parent = toggleframe3
+			buttonapi2.Value = buttontab2.Min or 0
+			buttonapi2.Object = toggleframe1
+
+			function buttonapi2:SetLayoutOrder(order)
+				toggleframe1.LayoutOrder = order
+			end
+
+			function buttonapi2:SetValue(val)
+				buttontab2.Function(val)
+				buttonapi2.Value = val
+				toggletext2.Text = val
+				toggleframe3:TweenPosition(UDim2.new(val / buttontab2.Max, -5, 0, -3), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.1, true)
+			end
+
+			toggleframe3.MouseButton1Down:connect(function()
+				local x,y,xscale,yscale,xscale2 = RelativeXY(toggleframe2, game:GetService("UserInputService"):GetMouseLocation())
+				buttonapi2:SetValue(math.floor(buttontab2.Min + ((buttontab2.Max - buttontab2.Min) * xscale)))
+				local move
+				local kill
+				move = game:GetService("UserInputService").InputChanged:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseMovement then
+						local x,y,xscale,yscale,xscale2 = RelativeXY(toggleframe2, game:GetService("UserInputService"):GetMouseLocation())
+						buttonapi2:SetValue(math.floor(buttontab2.Min + ((buttontab2.Max - buttontab2.Min) * xscale)))
+					end
+				end)
+				kill = game:GetService("UserInputService").InputEnded:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.MouseButton1 then
+						move:Disconnect()
+						kill:Disconnect()
+					end
+				end)
+			end)
+
+			return buttonapi2
 		end
-		if InterfaceRenderList then 
-			InterfaceRenderList:ToggleButton(false, riseoptions.ShowRenderModules)
+
+		function buttonapi:CreateTextBox(buttontab2)
+			local buttonapi2 = {}
+			local togglelayoutorder = #optionsbuttonchildren:GetChildren() + 1
+			local toggleframe1 = Instance.new("Frame")
+			toggleframe1.LayoutOrder = togglelayoutorder
+			toggleframe1.Size = UDim2.new(1, 0, 0, 30)
+			toggleframe1.BackgroundTransparency = 1
+			toggleframe1.ZIndex = 4
+			toggleframe1.Parent = optionsbuttonchildren
+			local toggletext = Instance.new("TextLabel")
+			toggletext.Text = "   "..buttontab2.Name
+			toggletext.TextSize = 22
+			toggletext.ZIndex = 4
+			toggletext.TextColor3 = Color3.fromRGB(190, 190, 190)
+			toggletext.Font = Enum.Font.SourceSansLight
+			toggletext.TextXAlignment = Enum.TextXAlignment.Left
+			toggletext.BackgroundTransparency = 1
+			toggletext.Size = UDim2.new(1, 0, 1, 0)
+			toggletext.Parent = toggleframe1
+			local calculatedsizetoggle = game:GetService("TextService"):GetTextSize(toggletext.Text, toggletext.TextSize, toggletext.Font, Vector2.new(1000000, 1000000))
+			local toggleframe2 = Instance.new("TextBox")
+			toggleframe2.Size = UDim2.new(0, 200, 0, 20)
+			toggleframe2.PlaceholderText = buttontab2["TempText"] or ""
+			toggleframe2.TextXAlignment = Enum.TextXAlignment.Left
+			toggleframe2.TextColor3 = Color3.new(1, 1, 1)
+			toggleframe2.TextSize = 20
+			toggleframe2.Font = Enum.Font.SourceSans
+			toggleframe2.Position = UDim2.new(0, calculatedsizetoggle.X + 14, 0, 6)
+			toggleframe2.PlaceholderColor3 = Color3.fromRGB(200, 200, 200)
+			toggleframe2.BackgroundTransparency = 1
+			toggleframe2.BorderSizePixel = 0
+			toggleframe2.ZIndex = 4
+			toggleframe2.Parent = toggleframe1
+			buttonapi2.Value = ""
+			buttonapi2.Object = toggleframe1
+
+			function buttonapi2:SetLayoutOrder(order)
+				toggleframe1.LayoutOrder = order
+			end
+
+			function buttonapi2:SetValue(val, entered)
+				toggleframe2.Text = val
+				buttonapi2.Value = val
+			end
+
+			toggleframe2.FocusLost:connect(function(enter)
+				buttonapi2:SetValue(toggleframe2.Text, true)
+				buttontab2.Function(toggleframe2.Text)
+			end)
+
+			return buttonapi2
 		end
-		if InterfaceRenderNotifications then 
-			InterfaceRenderNotifications:ToggleButton(false, riseoptions.RenderToggle)
+
+		function buttonapi:CreateDropdown(buttontab2)
+			local buttonapi2 = {}
+			local togglelayoutorder = #optionsbuttonchildren:GetChildren() + 1
+			local tab = buttontab2.List
+			local selecteditem2 = 1
+			local toggleframe1 = Instance.new("TextButton")
+			toggleframe1.LayoutOrder = togglelayoutorder
+			toggleframe1.Size = UDim2.new(1, 0, 0, 30)
+			toggleframe1.Text = ""
+			toggleframe1.BackgroundTransparency = 1
+			toggleframe1.ZIndex = 4
+			toggleframe1.Parent = optionsbuttonchildren
+			local toggletext = Instance.new("TextLabel")
+			toggletext.Text = "   "..buttontab2.Name.."   "..tab[selecteditem2]
+			toggletext.TextSize = 22
+			toggletext.ZIndex = 4
+			toggletext.TextColor3 = Color3.fromRGB(190, 190, 190)
+			toggletext.Font = Enum.Font.SourceSansLight
+			toggletext.TextXAlignment = Enum.TextXAlignment.Left
+			toggletext.BackgroundTransparency = 1
+			toggletext.Size = UDim2.new(1, 0, 1, 0)
+			toggletext.Parent = toggleframe1
+			buttonapi2.Value = tab[selecteditem2]
+			buttonapi2.Object = toggleframe1
+
+			function buttonapi2:SetValue(val)
+				buttonapi2.Value = val
+				selecteditem2 = table.find(tab, val) or 1
+				buttontab2.Function(val)
+				toggletext.Text = "   "..buttontab2.Name.."   "..tab[selecteditem2]
+			end
+
+			function buttonapi2:SetLayoutOrder(order)
+				toggleframe1.LayoutOrder = order
+			end
+
+			toggleframe1.MouseButton1Click:connect(function()
+				selecteditem2 = selecteditem2 + 1
+				if selecteditem2 > #tab then 
+					selecteditem2 = 1
+				end
+				buttonapi2:SetValue(tab[selecteditem2])
+			end)
+
+			toggleframe1.MouseButton2Click:connect(function()
+				selecteditem2 = selecteditem2 - 1
+				if selecteditem2 < 1 then 
+					selecteditem2 = #tab
+				end
+				buttonapi2:SetValue(tab[selecteditem2])
+			end)
+
+			return buttonapi2
 		end
-		if InterfaceRenderR then 
-			InterfaceRenderR:SetValue(math.floor(riseoptions.R * 255))
-		end
-		if InterfaceRenderG then 
-			InterfaceRenderG:SetValue(math.floor(riseoptions.G * 255))
-		end
-		if InterfaceRenderB then 
-			InterfaceRenderB:SetValue(math.floor(riseoptions.B * 255))
-		end
-		if NameTags then 
-			NameTags:ToggleButton(false, riseoptions.NameTags)
-		end
-		if risetextcustom then
-			risetextcustom.Text = riseoptions.CustomText
-			risetextcustom.TextLabel.Text = riseoptions.CustomText
-		end
+
+		optionsbutton.MouseButton1Click:connect(function()
+			if game:GetService("UserInputService"):GetMouseLocation().Y - optionsbutton.AbsolutePosition.Y <= 80 then
+				buttonapi:ToggleButton(true)
+			end
+		end)
+		optionsbutton.MouseButton2Click:connect(function()
+			optionsbuttonchildren.Visible = not optionsbuttonchildren.Visible
+			optionsbutton.Size = UDim2.new(1, 0, 0, optionsbuttonchildren.Visible and 40 + optionsbuttonchildren.Size.Y.Offset or 40)
+		end)
+
+		return buttonapi
 	end
+
+	return categoryapi
 end
 
-
-LoadSettings()
-spawn(function()
-	repeat
-		task.wait(10)
-		if (guilib.ScreenGui == nil or guilib.ScreenGui.Parent == nil) then break end
-		SaveSettings()
-	until (guilib.ScreenGui == nil or guilib.ScreenGui.Parent == nil)
-end)
-
-local UserInputService = game:GetService("UserInputService")
-local function isMobile()
-	return UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-end
-
-run(function()
-	if isMobile() then
-		local icon = "rbxassetid://18409008091"
-
-		local window = Instance.new("ScreenGui")
-		window.Parent = game:GetService("Players").LocalPlayer.PlayerGui
-		window.Name = "VoidwareIconButton"
-		window.ResetOnSpawn = false 
-
-		shared.GuiLibrary.SelfDestructEvent.Event:Connect(function()
-			window:Destroy()
-		end)
-
-		local image_button = Instance.new("ImageButton")
-		image_button.Parent = window
-		image_button.Image = icon
-		image_button.Position = UDim2.new(0.9, 0, 0.8, 0)
-		image_button.Size = UDim2.new(0, 70, 0, 70)
-		image_button.BackgroundTransparency = 1
-		image_button.ImageTransparency = 0.5
-
-		local ui_corner = Instance.new("UICorner")
-		ui_corner.Parent = image_button
-		ui_corner.CornerRadius = UDim.new(0, 100)
-
-		local TweenService = game:GetService("TweenService")
-
-		local function createTween(instance, transparency)
-			local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-			local goal = { ImageTransparency = transparency }
-			return TweenService:Create(instance, tweenInfo, goal)
-		end
-
-		local mouseEnterTween = createTween(image_button, 0)
-		local mouseLeaveTween = createTween(image_button, 0.5)
-
-		image_button.MouseEnter:Connect(function()
-			mouseLeaveTween:Cancel()
-			mouseEnterTween:Play()
-		end)
-
-		image_button.MouseLeave:Connect(function()
-			mouseEnterTween:Cancel()
-			mouseLeaveTween:Play()
-		end)
-
-		table.insert(shared.vapeConnections, image_button.MouseButton1Click:Connect(function() 
-			shared.GUIKeybindFunction() 
-		end))
-	end
-end)
+return uilib
