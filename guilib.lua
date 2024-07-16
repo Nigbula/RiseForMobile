@@ -1,5 +1,4 @@
--- test
-local uilib = {}
+		local uilib = {}
 		local getasset = getsynasset or getcustomasset or function(location) return "rbxasset://"..location end
 		local requestfunc = syn and syn.request or http and http.request or http_request or fluxus and fluxus.request or request or function(tab)
 			if tab.Method == "GET" then
@@ -197,7 +196,7 @@ local uilib = {}
 		local sidebarselected = Instance.new("Frame")
 		sidebarselected.Size = UDim2.new(1, 0, 0, 40)
 		sidebarselected.BorderSizePixel = 0
-		sidebarselected.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		sidebarselected.BackgroundColor3 = Color3.fromRGB(126, 94, 172)
 		sidebarselected.Parent = sidebar
 		local sidebarbuttonlist = Instance.new("UIListLayout")
 		sidebarbuttonlist.Padding = UDim.new()
