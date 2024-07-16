@@ -141,27 +141,18 @@ mainframe.ZIndex = 2
 
 dragGUI(mainframe)
 
-if not is_sirhurt_closure and syn and syn.protect_gui then
-	local gui = Instance.new("ScreenGui")
-	gui.Name = randomString()
-	gui.DisplayOrder = 999
-	syn.protect_gui(gui)
-	gui.Parent = game:GetService("CoreGui")
-	uilib.ScreenGui = gui
-elseif gethui then
-	local gui = Instance.new("ScreenGui")
-	gui.Name = randomString()
-	gui.DisplayOrder = 999
-	gui.Parent = gethui()
-	uilib.ScreenGui = gui
-elseif game:GetService("CoreGui"):FindFirstChild('RobloxGui') then
-	uilib.ScreenGui = game:GetService("CoreGui").RobloxGui
+local function resizeUI()
+	local screenSize = workspace.CurrentCamera.ViewportSize
+	local newSize = UDim2.new(0, math.min(495, screenSize.X * 0.8), 0, math.min(357, screenSize.Y * 0.8))
+	local newPosition = UDim2.new(0.176, -newSize.X.Offset / 0, 0.044, -newSize.Y.Offset / 0)
+
+
+	mainframe:TweenSize(newSize, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+	mainframe:TweenPosition(newPosition, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
 end
 
-if shared.testuirise then
-	shared.testuirise:Remove()
-end
-shared.testuirise = uilib.ScreenGui
+workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(resizeUI)
+resizeUI()
 
 local mainframe = Instance.new("Frame")
 mainframe.Size = UDim2.new(0, 548, 0, 300)
