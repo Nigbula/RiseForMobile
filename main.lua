@@ -76,7 +76,7 @@ local function GetURL(scripturl, rise)
 		end
 		return readfile((rise and "rise/" or "vape/")..scripturl)
 	else
-		local res = game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/"..(rise and "RiseForRoblox" or "VapeV4ForRoblox").."/main/"..scripturl, true)
+		local res = game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/"..(rise and "RiseForRoblox" or "vapevoidware").."/main/"..scripturl, true)
 		assert(res ~= "404: Not Found", "File not found")
 		return res
 	end
@@ -228,7 +228,7 @@ spawn(function()
 	end
 	VapeGui["MainGui"].ScaledGui.Visible = false
 end)
-loadstring(GetURL("NewMainScript.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/vapevoidware/main/NewMainScript.lua", true))()
 shared.VapeIndependent = true
 if not VapeGui then VapeGui = shared.GuiLibrary end
 local cachedassets = {}
@@ -249,7 +249,7 @@ local function getcustomassetfunc(path)
 			textlabel:Remove()
 		end)
 		local req = requestfunc({
-			Url = "https://raw.githubusercontent.com/7GrandDadPGN/RiseForRoblox/main/"..path:gsub("rise/assets", "assets"),
+			Url = "https://raw.githubusercontent.com/VapeVoidware/RiseForRoblox/main/"..path:gsub("rise/assets", "assets"),
 			Method = "GET"
 		})
 		writefile(path, req.Body)
@@ -262,7 +262,7 @@ end
 
 local teleportfunc = game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
 	if State == Enum.TeleportState.Started then
-		local teleportstr = 'shared.VapeSwitchServers = true if shared.VapeDeveloper then loadstring(readfile("rise/main.lua"))() else loadstring(game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/RiseForRoblox/main/main.lua", true))() end'
+		local teleportstr = 'shared.VapeSwitchServers = true if shared.VapeDeveloper then loadstring(readfile("rise/main.lua"))() else loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/RiseForRoblox/main/main.lua", true))() end'
 		if shared.VapeDeveloper then
 			teleportstr = 'shared.VapeDeveloper = true '..teleportstr
 		end
@@ -294,36 +294,16 @@ VapeGui["MainGui"].ScaledGui.ClickGui:GetPropertyChangedSignal("Visible"):connec
 		game:GetService("RunService"):SetRobloxGuiFocused(false)	
 	end)
 	if VapeGui["MainGui"].ScaledGui.ClickGui.Visible then
-		guilib.ScreenGui.MainFrame.Size = UDim2.new(0, 548, 0, 300)
-		guilib.ScreenGui.MainFrame.Position = UDim2.new(0.126, 0 , 0.08, 0)
-		guilib.ScreenGui.MainFrame:TweenSize(UDim2.new(0, 548, 0, 300), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true)
-		guilib.ScreenGui.MainFrame:TweenPosition(UDim2.new(0.126, 0 , 0.08, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true)
+		guilib.ScreenGui.MainFrame.Size = UDim2.new(0, 495, 0, 357)
+		guilib.ScreenGui.MainFrame.Position = UDim2.new(0.176, 0, 0.044, 0)
+		guilib.ScreenGui.MainFrame:TweenSize(UDim2.new(0, 495, 0, 357), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true)
+		guilib.ScreenGui.MainFrame:TweenPosition(UDim2.new(0.176, 0, 0.044, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true)
 	end
 end)
 local windowtabs = {
-	Combat = guilib:CreateCategory({
-		Name = "Combat",
-		Icon = "⚔️"
-	}),
-	Blatant = guilib:CreateCategory({
-		Name = "Blatant",
-		Icon = "⚠️"
-	}),
-	Render = guilib:CreateCategory({
-		Name = "Render",
-		Icon = "👁️"
-	}),
-	Utility = guilib:CreateCategory({
-		Name = "Utility",
-		Icon = "🛠️"
-	}),
-	World = guilib:CreateCategory({
-		Name = "World",
-		Icon = "🌎"
-	}),
 	Info = guilib:CreateCategory({
-		Name = "Info",
-		Icon = "ℹ️"
+		Name = "Read",
+		Icon = "🧾"
 	})
 }
 
@@ -343,7 +323,7 @@ infolab2.Position = UDim2.new(0, 250, 0, 136)
 infolab2.TextColor3 = Color3.fromRGB(130, 130, 130)
 infolab2.TextSize = 40
 infolab2.Font = Enum.Font.SourceSans
-infolab2.Text = "roblox"
+infolab2.Text = "mobile"
 infolab2.TextXAlignment = Enum.TextXAlignment.Left
 infolab2.TextYAlignment = Enum.TextYAlignment.Top
 infolab2.BackgroundTransparency = 1
@@ -353,7 +333,7 @@ infolab3.Position = UDim2.new(0, 124, 0, 263)
 infolab3.TextColor3 = Color3.fromRGB(180, 180, 180)
 infolab3.TextSize = 30
 infolab3.Font = Enum.Font.SourceSansLight
-infolab3.Text = "Registered to xylex"
+infolab3.Text = "Optimized for mobile"
 infolab3.TextXAlignment = Enum.TextXAlignment.Left
 infolab3.TextYAlignment = Enum.TextYAlignment.Top
 infolab3.BackgroundTransparency = 1
@@ -363,17 +343,9 @@ infolab4.Position = UDim2.new(0, 124, 0, 320)
 infolab4.TextColor3 = Color3.fromRGB(130, 130, 130)
 infolab4.TextSize = 30
 infolab4.Font = Enum.Font.SourceSansLight
-infolab4.Text = [[
-Orignal Client by Alan32, Technio
-Strikeless, Nicklas, Auth,
-Hazsi, Solastis
-and Billionare
-intent.store
-riseclient.com
-    
-Roblox Port by 7GrandDad
-All rights goto the Rise Team
-]]
+infolab4.Text = [[Edit your config using Voidware, How to get Voidware? Join discord.gg/voidware]]
+
+
 infolab4.TextXAlignment = Enum.TextXAlignment.Left
 infolab4.TextYAlignment = Enum.TextYAlignment.Top
 infolab4.BackgroundTransparency = 1
@@ -689,7 +661,7 @@ end
 
 
 local risetext = Instance.new("TextLabel")
-risetext.Text = "Rise"
+risetext.Text = ""
 risetext.Font = Enum.Font.TitilliumWeb
 risetext.TextSize = 53
 risetext.TextColor3 = Color3.new(1, 1, 1)
@@ -711,8 +683,8 @@ risegradient.Parent = risetext
 local risetextversion = risetext:Clone()
 local risetextcustom = risetext:Clone()
 risetextversion.TextSize = 26
-risetextversion.Text = "5.94"
-risetextversion.Position = UDim2.new(0, 66, 0, 6)
+risetextversion.Text = ""
+risetextversion.Position = UDim2.new(0, 230, 0, 6)
 risetextversion.Parent = risetext
 risetextversion.TextLabel.TextSize = 26
 risetextversion.TextLabel.Text = risetextversion.Text
@@ -1195,3 +1167,60 @@ spawn(function()
 		SaveSettings()
 	until (guilib.ScreenGui == nil or guilib.ScreenGui.Parent == nil)
 end)
+
+local UserInputService = game:GetService("UserInputService")
+local function isMobile()
+	return UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+end
+
+run(function()
+	if isMobile() then
+		local icon = "rbxassetid://18409008091"
+
+		local window = Instance.new("ScreenGui")
+		window.Parent = game:GetService("Players").LocalPlayer.PlayerGui
+		window.Name = "VoidwareIconButton"
+		window.ResetOnSpawn = false 
+
+		shared.GuiLibrary.SelfDestructEvent.Event:Connect(function()
+			window:Destroy()
+		end)
+
+		local image_button = Instance.new("ImageButton")
+		image_button.Parent = window
+		image_button.Image = icon
+		image_button.Position = UDim2.new(0.9, 0, 0.8, 0)
+		image_button.Size = UDim2.new(0, 70, 0, 70)
+		image_button.BackgroundTransparency = 1
+		image_button.ImageTransparency = 0.5
+
+		local ui_corner = Instance.new("UICorner")
+		ui_corner.Parent = image_button
+		ui_corner.CornerRadius = UDim.new(0, 100)
+
+		local TweenService = game:GetService("TweenService")
+
+		local function createTween(instance, transparency)
+			local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+			local goal = { ImageTransparency = transparency }
+			return TweenService:Create(instance, tweenInfo, goal)
+		end
+
+		local mouseEnterTween = createTween(image_button, 0)
+		local mouseLeaveTween = createTween(image_button, 0.5)
+
+		image_button.MouseEnter:Connect(function()
+			mouseLeaveTween:Cancel()
+			mouseEnterTween:Play()
+		end)
+
+		image_button.MouseLeave:Connect(function()
+			mouseEnterTween:Cancel()
+			mouseLeaveTween:Play()
+		end)
+
+		table.insert(shared.vapeConnections, image_button.MouseButton1Click:Connect(function() 
+			shared.GUIKeybindFunction() 
+		end))
+	end
+end)	
