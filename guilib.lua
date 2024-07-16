@@ -636,7 +636,7 @@ function uilib:CreateCategory(categorytab)
 
 			function buttonapi2:SetLayoutOrder(order)
 				toggleframe1.LayoutOrder = order
-			end
+			endend
 
 			toggleframe1.MouseButton1Click:connect(function()
 				selecteditem2 = selecteditem2 + 1
