@@ -1,6 +1,6 @@
 local riseoptions = {
 	CustomText = "",
-	Theme = "Rise Christmas",
+	Theme = "Rise",
 	RenderToggle = true,
 	ShowRenderModules = true,
 	NameTags = false,
@@ -334,10 +334,6 @@ local windowtabs = {
 	}),
 	VoidwareDev = guilib:CreateCategory({
 		Name = "VoidwareDev",
-		Icon = "🛠️"
-	}),
-	MobileSupport = guilib:CreateCategory({
-		Name = "MobileSupport",
 		Icon = "🛠️"
 	})
 }
