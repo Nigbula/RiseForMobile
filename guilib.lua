@@ -1,4 +1,3 @@
-
 local uilib = {}
 local getasset = getsynasset or getcustomasset or function(location) return "rbxasset://"..location end
 local requestfunc = syn and syn.request or http and http.request or http_request or fluxus and fluxus.request or request or function(tab)
@@ -50,7 +49,7 @@ local function getcustomassetfunc(path)
 			textlabel:Remove()
 		end)
 		local req = requestfunc({
-			Url = "https://raw.githubusercontent.com/7GrandDadPGN/RiseForRoblox/main/"..path:gsub("rise/assets", "assets"),
+			Url = "https://raw.githubusercontent.com/VapeVoidware/RiseForRoblox/main/"..path:gsub("rise/assets", "assets"),
 			Method = "GET"
 		})
 		writefile(path, req.Body)
@@ -132,9 +131,9 @@ end
 shared.testuirise = uilib.ScreenGui
 
 local mainframe = Instance.new("Frame")
-mainframe.Size = UDim2.new(0, 495, 0, 357)
+mainframe.Size = UDim2.new(0, 830, 0, 700)
 mainframe.BackgroundColor3 = Color3.fromRGB(27, 23, 33)
-mainframe.Position = UDim2.new(0.176, 0, 0.044, 0)
+mainframe.Position = UDim2.new(0.5, -415, 0.5, -350)
 mainframe.Name = "MainFrame"
 mainframe.Parent = uilib.ScreenGui
 mainframe.ZIndex = 2
@@ -143,9 +142,8 @@ dragGUI(mainframe)
 
 local function resizeUI()
 	local screenSize = workspace.CurrentCamera.ViewportSize
-	local newSize = UDim2.new(0, math.min(495, screenSize.X * 0.8), 0, math.min(357, screenSize.Y * 0.8))
-	local newPosition = UDim2.new(0.176, -newSize.X.Offset / 0, 0.044, -newSize.Y.Offset / 0)
-
+	local newSize = UDim2.new(0, math.min(830, screenSize.X * 0.8), 0, math.min(700, screenSize.Y * 0.8))
+	local newPosition = UDim2.new(0.5, -newSize.X.Offset / 2, 0.5, -newSize.Y.Offset / 2)
 
 	mainframe:TweenSize(newSize, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
 	mainframe:TweenPosition(newPosition, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
@@ -154,13 +152,6 @@ end
 workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(resizeUI)
 resizeUI()
 
-local mainframe = Instance.new("Frame")
-mainframe.Size = UDim2.new(0, 548, 0, 300)
-mainframe.BackgroundColor3 = Color3.fromRGB(21, 21, 21)
-mainframe.Position = UDim2.new(0.126, 0 , 0.08, 0)
-mainframe.Name = "MainFrame"
-mainframe.Parent = uilib.ScreenGui
-mainframe.ZIndex = 2
 local mainframe2 = mainframe:Clone()
 mainframe2.Position = UDim2.new(0, 0, 0, 0)
 mainframe2.Size = UDim2.new(0, 6, 1, 0)
