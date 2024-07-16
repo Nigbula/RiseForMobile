@@ -132,6 +132,38 @@ end
 shared.testuirise = uilib.ScreenGui
 
 local mainframe = Instance.new("Frame")
+mainframe.Size = UDim2.new(0, 495, 0, 357)
+mainframe.BackgroundColor3 = Color3.fromRGB(27, 23, 33)
+mainframe.Position = UDim2.new(0.176, 0, 0.044, 0)
+mainframe.Name = "MainFrame"
+mainframe.Parent = uilib.ScreenGui
+mainframe.ZIndex = 2
+
+dragGUI(mainframe)
+
+if not is_sirhurt_closure and syn and syn.protect_gui then
+	local gui = Instance.new("ScreenGui")
+	gui.Name = randomString()
+	gui.DisplayOrder = 999
+	syn.protect_gui(gui)
+	gui.Parent = game:GetService("CoreGui")
+	uilib.ScreenGui = gui
+elseif gethui then
+	local gui = Instance.new("ScreenGui")
+	gui.Name = randomString()
+	gui.DisplayOrder = 999
+	gui.Parent = gethui()
+	uilib.ScreenGui = gui
+elseif game:GetService("CoreGui"):FindFirstChild('RobloxGui') then
+	uilib.ScreenGui = game:GetService("CoreGui").RobloxGui
+end
+
+if shared.testuirise then
+	shared.testuirise:Remove()
+end
+shared.testuirise = uilib.ScreenGui
+
+local mainframe = Instance.new("Frame")
 mainframe.Size = UDim2.new(0, 548, 0, 300)
 mainframe.BackgroundColor3 = Color3.fromRGB(21, 21, 21)
 mainframe.Position = UDim2.new(0.126, 0 , 0.08, 0)
