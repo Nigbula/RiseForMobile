@@ -335,6 +335,10 @@ local windowtabs = {
 	VoidwareDev = guilib:CreateCategory({
 		Name = "VoidwareDev",
 		Icon = "🛠️"
+	}),
+	MobileSupport = guilib:CreateCategory({
+		Name = "MobileSupport",
+		Icon = "🛠️"
 	})
 }
 
@@ -344,7 +348,7 @@ infolab1.Position = UDim2.new(0, 124, 0, 155)
 infolab1.TextColor3 = Color3.fromRGB(180, 180, 180)
 infolab1.TextSize = 90
 infolab1.Font = Enum.Font.SourceSans
-infolab1.Text = "Rise"
+infolab1.Text = "Rise x Voidware"
 infolab1.TextXAlignment = Enum.TextXAlignment.Left
 infolab1.TextYAlignment = Enum.TextYAlignment.Bottom
 infolab1.BackgroundTransparency = 1
@@ -354,7 +358,7 @@ infolab2.Position = UDim2.new(0, 250, 0, 136)
 infolab2.TextColor3 = Color3.fromRGB(130, 130, 130)
 infolab2.TextSize = 40
 infolab2.Font = Enum.Font.SourceSans
-infolab2.Text = "mobile"
+infolab2.Text = "roblox"
 infolab2.TextXAlignment = Enum.TextXAlignment.Left
 infolab2.TextYAlignment = Enum.TextYAlignment.Top
 infolab2.BackgroundTransparency = 1
@@ -364,7 +368,7 @@ infolab3.Position = UDim2.new(0, 124, 0, 263)
 infolab3.TextColor3 = Color3.fromRGB(180, 180, 180)
 infolab3.TextSize = 30
 infolab3.Font = Enum.Font.SourceSansLight
-infolab3.Text = " "
+infolab3.Text = "Registered to Voidware"
 infolab3.TextXAlignment = Enum.TextXAlignment.Left
 infolab3.TextYAlignment = Enum.TextYAlignment.Top
 infolab3.BackgroundTransparency = 1
@@ -374,7 +378,19 @@ infolab4.Position = UDim2.new(0, 124, 0, 320)
 infolab4.TextColor3 = Color3.fromRGB(130, 130, 130)
 infolab4.TextSize = 30
 infolab4.Font = Enum.Font.SourceSansLight
-infolab4.Text = [[]]
+infolab4.Text = [[
+Roblox Vape conversion - Xylex
+Modules - Vape and Voidware
+Orignal Client by Alan32, Technio
+Strikeless, Nicklas, Auth,
+Hazsi, Solastis
+and Billionare
+intent.store
+riseclient.com
+    
+Roblox Port by 7GrandDad
+All rights goto the Rise Team
+]]
 infolab4.TextXAlignment = Enum.TextXAlignment.Left
 infolab4.TextYAlignment = Enum.TextYAlignment.Top
 infolab4.BackgroundTransparency = 1
