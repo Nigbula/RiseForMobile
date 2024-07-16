@@ -328,8 +328,16 @@ local windowtabs = {
 		Name = "Voidware",
 		Icon = "🛠️"
 	}),
+	GameScripts = guilib:CreateCategory({
+		Name = "GameScripts",
+		Icon = "🛠️"
+	}),
 	VoidwareDev = guilib:CreateCategory({
 		Name = "VoidwareDev",
+		Icon = "🛠️"
+	}),
+	MobileSupport = guilib:CreateCategory({
+		Name = "MobileSupport",
 		Icon = "🛠️"
 	})
 }
